@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planungsassistent – Finanzielle Bildung</title>
+<style>
+:root {
+  --navy: #1a365d;
+  --navy-light: #2a4a7f;
+  --teal: #2b7a78;
+  --teal-light: #3aafa9;
+  --amber: #d69e2e;
+  --red: #c53030;
+  --green: #276749;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #1a202c;
+  --text-muted: #4a5568;
+  --text-light: #718096;
+  --border: #e2e8f0;
+  --border-focus: #2b7a78;
+  --highlight: #ebf8ff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+.app { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* Header */
+.app-header {
+  text-align: center;
+  padding: 48px 0 40px;
+}
+.app-header .eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 12px;
+}
+.app-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+.app-header .subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* Progress */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 36px;
+  padding: 0 4px;
+}
+.progress-segment {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.progress-segment.done { background: var(--teal); }
+.progress-segment.active { background: var(--teal-light); }
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+.progress-label {
+  font-size: 11px;
+  color: var(--text-light);
+  text-align: center;
+  flex: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.progress-label.active { color: var(--teal); font-weight: 600; }
+.progress-label.done { color: var(--navy); }
+
+/* Blocks */
+.block { display: none; }
+.block.active { display: block; }
+
+.block-head {
+  margin-bottom: 28px;
+}
+.block-head .block-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.block-head h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.block-head .block-intro {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Fields */
+.field {
+  margin-bottom: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+}
+.field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: block;
+}
+.field-hint {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+.field-source {
+  font-size: 11px;
+  color: var(--teal);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+input[type="text"], input[type="number"], textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(43,122,120,0.1);
+}
+textarea { min-height: 80px; resize: vertical; }
+
+/* Radio & Checkbox groups */
+.option-group { display: flex; flex-direction: column; gap: 6px; }
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.option-item:hover { border-color: var(--teal-light); background: var(--highlight); }
+.option-item.selected { border-color: var(--teal); background: var(--highlight); }
+.option-item input[type="radio"],
+.option-item input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: var(--teal);
+  width: auto;
+}
+.option-item label {
+  font-size: 14px;
+  cursor: pointer;
+  flex: 1;
+}
+
+/* Conditional follow-ups */
+.followup {
+  display: none;
+  margin-top: 12px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 6px;
+  border-left: 3px solid var(--teal);
+}
+.followup.visible { display: block; }
+
+/* Hint banner */
+.hint-banner {
+  padding: 12px 16px;
+  background: #fffff0;
+  border: 1px solid #fefcbf;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #744210;
+  margin-bottom: 24px;
+}
+
+/* Navigation */
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.btn {
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.1s;
+  font-family: inherit;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary {
+  background: var(--teal);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--navy-light); }
+.btn-secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg); }
+.btn-ghost {
+  background: transparent;
+  color: var(--teal);
+  padding: 10px 16px;
+}
+
+/* KL Candidate tabs */
+.candidate-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.candidate-tab {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-family: inherit;
+}
+.candidate-tab.active {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+}
+
+/* Results */
+.results-section { display: none; }
+.results-section.active { display: block; }
+
+.output-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.output-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.output-card-header:hover { background: var(--bg); }
+.output-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.output-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tag-green { background: #c6f6d5; color: #276749; }
+.tag-yellow { background: #fefcbf; color: #744210; }
+.tag-red { background: #fed7d7; color: #9b2c2c; }
+.output-chevron {
+  font-size: 18px;
+  color: var(--text-light);
+  transition: transform 0.2s;
+}
+.output-card.open .output-chevron { transform: rotate(180deg); }
+.output-card-body {
+  display: none;
+  padding: 0 20px 20px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.output-card.open .output-card-body { display: block; }
+
+.output-text {
+  white-space: pre-wrap;
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Risk traffic light */
+.risk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.risk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg);
+}
+.risk-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.risk-dot.green { background: var(--green); }
+.risk-dot.yellow { background: var(--amber); }
+.risk-dot.red { background: var(--red); }
+
+/* Sharing section */
+.share-section {
+  margin-top: 32px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.share-section h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.share-section .share-intro {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.share-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.share-check:last-of-type { border-bottom: none; }
+.share-check input { margin-top: 3px; accent-color: var(--teal); }
+.share-check label { font-size: 14px; cursor: pointer; }
+.share-check .share-desc { font-size: 12px; color: var(--text-light); }
+
+/* Intro screen */
+.intro-screen {
+  text-align: center;
+  padding: 60px 0 40px;
+}
+.intro-screen h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+.intro-screen .intro-text {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto 32px;
+}
+.start-btn {
+  padding: 14px 36px;
+  font-size: 16px;
+}
+
+/* Print */
+@media print {
+  .nav-row, .progress-bar, .progress-labels, .share-section,
+  .btn, .app-header { display: none !important; }
+  .block, .results-section { display: block !important; }
+  .output-card-body { display: block !important; }
+  .output-card { break-inside: avoid; }
+  body { background: #fff; font-size: 12px; }
+  .app { max-width: 100%; padding: 0; }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .app { padding: 16px 12px 60px; }
+  .app-header h1, .intro-screen h1 { font-size: 24px; }
+  .risk-grid { grid-template-columns: 1fr; }
+  .progress-labels { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ==================== INTRO ==================== -->
+  <div id="intro" class="intro-screen">
+    <div style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;">Qualitätsleitfaden Finanzielle Bildung</div>
+    <h1>Planungsassistent</h1>
+    <p class="intro-text">Dieses Werkzeug begleitet Sie durch die Planung eines Angebots zur finanziellen Bildung. Am Ende erhalten Sie eine Angebotsbeschreibung, ein Zielgruppenprofil, einen Ausschreibungsentwurf und weitere Planungsdokumente.</p>
+    <p style="font-size:13px;color:var(--text-light);max-width:480px;margin:0 auto 28px;">Die Fragen folgen dem Qualitätsleitfaden für finanzielle Bildung in der Erwachsenenbildung. Alle Eingaben bleiben in Ihrem Browser. Nichts wird an einen Server übertragen.</p>
+    <button class="btn btn-primary start-btn" onclick="startAssistant()">Planung beginnen</button>
+    <div style="margin-top:16px;"><a href="materialpool.html" style="font-size:14px;color:var(--teal);text-decoration:none;border-bottom:2px solid rgba(43,122,120,0.3);padding-bottom:2px;">Zum Materialpool mit Beispielen anderer Einrichtungen →</a></div>
+  </div>
+
+  <!-- ==================== WIZARD ==================== -->
+  <div id="wizard" style="display:none;">
+    <div class="progress-labels" id="progressLabels"></div>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- ====== BLOCK 1: Was planen Sie? ====== -->
+    <div class="block" id="block-1">
+      <div class="block-head">
+        <div class="block-number">Schritt 1 von 5</div>
+        <h2>Was planen Sie?</h2>
+        <p class="block-intro">Diese Angaben bestimmen den weiteren Verlauf. Bei einer Wiederholung werden einige Fragen verkürzt.</p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Arbeitstitel des Angebots</span>
+        <input type="text" id="b1_titel" placeholder="z. B. Finanzielle Grundbildung für Frauen">
+      </div>
+
+      <div class="field">
+        <span class="field-label">Art des Angebots</span>
+        <div class="option-group" data-name="b1_art">
+          <div class="option-item" data-value="neu"><input type="radio" name="b1_art" value="neu" id="b1_art_neu"><label for="b1_art_neu">Neues Angebot</label></div>
+          <div class="option-item" data-value="wiederholung"><input type="radio" name="b1_art" value="wiederholung" id="b1_art_wh"><label for="b1_art_wh">Wiederholung eines bestehenden Angebots</label></div>
+          <div class="option-item" data-value="weiterentwicklung"><input type="radio" name="b1_art" value="weiterentwicklung" id="b1_art_we"><label for="b1_art_we">Weiterentwicklung eines bestehenden Angebots</label></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Woher kommt der Anlass für dieses Angebot?</span>
+        <span class="field-hint">Mehrfachnennung möglich</span>
+        <div class="option-group">
+          <div class="option-item"><input type="checkbox" name="b1_anlass" value="rueckmeldungen" id="b1a1"><label for="b1a1">Rückmeldungen von Teilnehmenden</label></div>
+          <div class="option-item"><input type="checkbox" name="b1_anlass" value="beobachtung" id="b1a2"><label for="b1a2">Eigene Beobachtung in der Praxis</label></div>
+          <div class="option-item"><input type="checkbox" name="b1_anlass" value="auftrag" id="b1a3"><label for="b1a3">Auftrag des Trägers oder der Leitung</label></div>
+          <div class="option-item"><input type="checkbox" name="b1_anlass" value="foerderung" id="b1a4"><label for="b1a4">Förderprogramm oder Projektauftrag</label></div>
+          <div class="option-item"><input type="checkbox" name="b1_anlass" value="kooperation" id="b1a5"><label for="b1a5">Anfrage von Kooperationspartner:innen</label></div>
+          <div class="option-item"><input type="checkbox" name="b1_anlass" value="eigeninteresse" id="b1a6"><label for="b1a6">Eigenes fachliches Interesse</label></div>
+        </div>
+        <div class="followup" id="b1_foerder_followup">
+          <span class="field-label">Welche besonderen Anforderungen stellt das Förderprogramm?</span>
+          <textarea id="b1_foerder_details" placeholder="z. B. Mindeststundenzahl, bestimmte Zielgruppe, Berichtsformat …"></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Gibt es zeitliche oder institutionelle Vorgaben?</span>
+        <span class="field-hint">z. B. fester Starttermin, Semesterraster, Projektförderzeitraum</span>
+        <input type="text" id="b1_vorgaben" placeholder="Optional">
+        <div class="field-source">Qualitätsleitfaden: Bildungsmanagement und Programmplanung, Mesoebene</div>
+      </div>
+
+      <div class="nav-row">
+        <span></span>
+        <button class="btn btn-primary" onclick="goTo(2)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- ====== BLOCK 2: Für wen? ====== -->
+    <div class="block" id="block-2">
+      <div class="block-head">
+        <div class="block-number">Schritt 2 von 5</div>
+        <h2>Für wen ist das Angebot?</h2>
+        <p class="block-intro">Die Zielgruppe bestimmt Inhalte, Format, Methode und Ansprache. Diese Angaben fließen in das Zielgruppenprofil und in die spätere Prüfung der Kursleitungs-Passung.</p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Wen möchten Sie mit dem Angebot erreichen?</span>
+        <span class="field-hint">Beschreiben Sie in eigenen Worten, an wen Sie denken.</span>
+        <textarea id="b2_zielgruppe" placeholder="z. B. Frauen in der Familienphase, die sich erstmals mit Altersvorsorge befassen"></textarea>
+        <div class="field-source">Qualitätsleitfaden: Zielgruppenwissen und -Kenntnisse, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Wie fassen Sie diese Zielgruppe?</span>
+        <span class="field-hint">Mehrfachnennung möglich</span>
+        <div class="option-group">
+          <div class="option-item"><input type="checkbox" name="b2_fassung" value="lebensphase" id="b2f1"><label for="b2f1">Über die Lebensphase (z. B. Berufseinstieg, Familienphase, Ruhestand)</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_fassung" value="lebenswelt" id="b2f2"><label for="b2f2">Über die Lebenswelt oder das Milieu</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_fassung" value="soziodemografie" id="b2f3"><label for="b2f3">Über soziodemographische Merkmale (z. B. Geschlecht, Einkommen)</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_fassung" value="zugang" id="b2f4"><label for="b2f4">Über den Zugang zur Einrichtung (z. B. bestehende Teilnehmende)</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_fassung" value="vorgegeben" id="b2f5"><label for="b2f5">Durch den Fördergeber oder Träger vorgegeben</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_fassung" value="keine" id="b2f6"><label for="b2f6">Ohne explizite Zielgruppenansprache</label></div>
+        </div>
+        <div class="followup" id="b2_vorgabe_followup">
+          <span class="field-label">Wie lautet die Vorgabe des Fördergebers?</span>
+          <textarea id="b2_vorgabe_details"></textarea>
+        </div>
+        <div class="followup" id="b2_keine_followup">
+          <div class="hint-banner">Der Qualitätsleitfaden empfiehlt, die Konsequenzen eines Verzichts auf Zielgruppenansprache zu reflektieren.</div>
+          <span class="field-label">Warum verzichten Sie auf eine Zielgruppenansprache?</span>
+          <textarea id="b2_keine_grund"></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Welche Bedarfe dieser Zielgruppe im Bereich finanzieller Bildung sind Ihnen bereits bekannt?</span>
+        <textarea id="b2_bedarfe" placeholder="z. B. Unsicherheit bei der Altersvorsorge, fehlendes Grundwissen zu Versicherungen"></textarea>
+        <div class="field-source">Qualitätsleitfaden: Bedarfe und Bedarfserschließung, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Woher stammt Ihr Wissen über diese Bedarfe?</span>
+        <span class="field-hint">Mehrfachnennung möglich</span>
+        <div class="option-group">
+          <div class="option-item"><input type="checkbox" name="b2_quelle" value="evaluation" id="b2q1"><label for="b2q1">Evaluationen früherer Angebote</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_quelle" value="muendlich" id="b2q2"><label for="b2q2">Mündliche Rückmeldungen</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_quelle" value="beobachtung" id="b2q3"><label for="b2q3">Eigene Beobachtung in Beratung oder Kursen</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_quelle" value="studien" id="b2q4"><label for="b2q4">Studien oder Berichte</label></div>
+          <div class="option-item"><input type="checkbox" name="b2_quelle" value="annahme" id="b2q5"><label for="b2q5">Annahme, noch nicht überprüft</label></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Spielen kulturelle oder religiöse Aspekte im Umgang mit Geld für diese Zielgruppe eine Rolle?</span>
+        <div class="option-group" data-name="b2_kultur">
+          <div class="option-item" data-value="ja_bekannt"><input type="radio" name="b2_kultur" value="ja_bekannt" id="b2k1"><label for="b2k1">Ja, bereits bekannte Aspekte</label></div>
+          <div class="option-item" data-value="vermutlich"><input type="radio" name="b2_kultur" value="vermutlich" id="b2k2"><label for="b2k2">Vermutlich ja, noch nicht konkret erhoben</label></div>
+          <div class="option-item" data-value="nein"><input type="radio" name="b2_kultur" value="nein" id="b2k3"><label for="b2k3">Nein, nach aktuellem Kenntnisstand nicht</label></div>
+          <div class="option-item" data-value="unklar"><input type="radio" name="b2_kultur" value="unklar" id="b2k4"><label for="b2k4">Kann ich nicht einschätzen</label></div>
+        </div>
+        <div class="followup" id="b2_kultur_followup">
+          <span class="field-label">Welche kulturellen oder religiösen Aspekte sind bekannt?</span>
+          <textarea id="b2_kultur_details" placeholder="z. B. Zinsverbot, familiäre Geldtransfers, unterschiedliche Vorsorgetraditionen"></textarea>
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Zielgruppenwissen, kulturelle und religiöse Aspekte, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Welche Konsequenzen hat die Zielgruppe für die Gestaltung?</span>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+          <div>
+            <span class="field-hint">Konsequenzen für die Inhalte</span>
+            <textarea id="b2_konseq_inhalt" placeholder="z. B. alltagsnahe Beispiele statt abstrakter Modelle" style="min-height:60px;"></textarea>
+          </div>
+          <div>
+            <span class="field-hint">Konsequenzen für das Format</span>
+            <textarea id="b2_konseq_format" placeholder="z. B. Abendtermine, kurze Einheiten, Kinderbetreuung" style="min-height:60px;"></textarea>
+          </div>
+          <div>
+            <span class="field-hint">Konsequenzen für Ansprache und Methode</span>
+            <textarea id="b2_konseq_methode" placeholder="z. B. einfache Sprache, Austausch in Kleingruppen" style="min-height:60px;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-secondary" onclick="goTo(1)">Zurück</button>
+        <button class="btn btn-primary" onclick="goTo(3)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- ====== BLOCK 3: Was soll das Angebot bewirken? ====== -->
+    <div class="block" id="block-3">
+      <div class="block-head">
+        <div class="block-number">Schritt 3 von 5</div>
+        <h2>Was soll das Angebot bewirken?</h2>
+        <p class="block-intro">Die didaktische Ausrichtung bestimmt die Anforderungen an die Kursleitung und die Gestaltung der Ausschreibung.</p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Was sollen die Teilnehmenden nach dem Angebot können oder wissen?</span>
+        <span class="field-hint">Formulieren Sie das Lernziel möglichst konkret.</span>
+        <textarea id="b3_lernziel" placeholder="z. B. Die Teilnehmerinnen können ihre Rentenlücke berechnen und kennen drei Vorsorgeoptionen."></textarea>
+        <div class="field-source">Qualitätsleitfaden: Didaktische Gestaltung, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Welche Wirkungsrichtung hat das Angebot?</span>
+        <div class="option-group" data-name="b3_wirkung">
+          <div class="option-item" data-value="informierend"><input type="radio" name="b3_wirkung" value="informierend" id="b3w1"><label for="b3w1">Informierend – Wissen und Orientierung vermitteln</label></div>
+          <div class="option-item" data-value="reflektierend"><input type="radio" name="b3_wirkung" value="reflektierend" id="b3w2"><label for="b3w2">Reflektierend – die eigene Situation einordnen und bewerten</label></div>
+          <div class="option-item" data-value="anwendungsorientiert"><input type="radio" name="b3_wirkung" value="anwendungsorientiert" id="b3w3"><label for="b3w3">Anwendungsorientiert – konkret im Alltag umsetzen</label></div>
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Didaktische Gestaltung (LRNK), Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Greift das Angebot einen gesellschaftlichen Trend auf?</span>
+        <span class="field-hint">Mehrfachnennung möglich</span>
+        <div class="option-group">
+          <div class="option-item"><input type="checkbox" name="b3_trend" value="vorsorge" id="b3t1"><label for="b3t1">Individualisierung der Altersvorsorge</label></div>
+          <div class="option-item"><input type="checkbox" name="b3_trend" value="sicherheit" id="b3t2"><label for="b3t2">Sicherheit im digitalen Raum (Finfluencing, Betrug)</label></div>
+          <div class="option-item"><input type="checkbox" name="b3_trend" value="digital" id="b3t3"><label for="b3t3">Digitale Währungen und Geschäftsmodelle</label></div>
+          <div class="option-item"><input type="checkbox" name="b3_trend" value="bargeld" id="b3t4"><label for="b3t4">Abschaffung von Bargeld</label></div>
+          <div class="option-item"><input type="checkbox" name="b3_trend" value="anderer" id="b3t5"><label for="b3t5">Anderes Thema</label></div>
+          <div class="option-item"><input type="checkbox" name="b3_trend" value="keinen" id="b3t6"><label for="b3t6">Keinen bestimmten Trend</label></div>
+        </div>
+        <div class="followup" id="b3_trend_followup">
+          <span class="field-label">Welches Thema?</span>
+          <input type="text" id="b3_trend_anderes">
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Gesellschaftliche Trends und Transformationen, Makroebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">In welchem Format soll das Angebot stattfinden?</span>
+        <div class="option-group" data-name="b3_format">
+          <div class="option-item" data-value="einzelveranstaltung"><input type="radio" name="b3_format" value="einzelveranstaltung" id="b3f1"><label for="b3f1">Einzelveranstaltung (bis 3 Unterrichtseinheiten)</label></div>
+          <div class="option-item" data-value="reihe"><input type="radio" name="b3_format" value="reihe" id="b3f2"><label for="b3f2">Reihe oder Kurs (mehr als 3 UE)</label></div>
+          <div class="option-item" data-value="internat"><input type="radio" name="b3_format" value="internat" id="b3f3"><label for="b3f3">Veranstaltung mit Unterbringung</label></div>
+          <div class="option-item" data-value="offen"><input type="radio" name="b3_format" value="offen" id="b3f4"><label for="b3f4">Noch offen</label></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Wie viele Unterrichtseinheiten (à 45 Min.) sind vorgesehen?</span>
+        <input type="number" id="b3_ue" min="1" placeholder="z. B. 6">
+      </div>
+
+      <div class="field">
+        <span class="field-label">In welcher Lernform?</span>
+        <div class="option-group" data-name="b3_lernform">
+          <div class="option-item" data-value="praesenz"><input type="radio" name="b3_lernform" value="praesenz" id="b3l1"><label for="b3l1">Präsenz</label></div>
+          <div class="option-item" data-value="online_synchron"><input type="radio" name="b3_lernform" value="online_synchron" id="b3l2"><label for="b3l2">Online synchron</label></div>
+          <div class="option-item" data-value="hybrid"><input type="radio" name="b3_lernform" value="hybrid" id="b3l3"><label for="b3l3">Hybrid</label></div>
+          <div class="option-item" data-value="blended"><input type="radio" name="b3_lernform" value="blended" id="b3l4"><label for="b3l4">Mischform (Blended Learning)</label></div>
+          <div class="option-item" data-value="lernform_offen"><input type="radio" name="b3_lernform" value="lernform_offen" id="b3l5"><label for="b3l5">Noch offen</label></div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-secondary" onclick="goTo(2)">Zurück</button>
+        <button class="btn btn-primary" onclick="goTo(4)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- ====== BLOCK 4: Kursleitung ====== -->
+    <div class="block" id="block-4">
+      <div class="block-head">
+        <div class="block-number">Schritt 4 von 5</div>
+        <h2>Wer soll das Angebot durchführen?</h2>
+        <p class="block-intro">Die Anforderungen an die Kursleitung ergeben sich aus Ihren bisherigen Angaben zu Zielgruppe und Wirkungsrichtung.</p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Steht bereits eine Kursleitung fest?</span>
+        <div class="option-group" data-name="b4_status">
+          <div class="option-item" data-value="fest"><input type="radio" name="b4_status" value="fest" id="b4s1"><label for="b4s1">Ja, eine Person steht fest</label></div>
+          <div class="option-item" data-value="kandidaten"><input type="radio" name="b4_status" value="kandidaten" id="b4s2"><label for="b4s2">Es gibt zwei oder mehr Kandidat:innen</label></div>
+          <div class="option-item" data-value="suche"><input type="radio" name="b4_status" value="suche" id="b4s3"><label for="b4s3">Nein, es wird noch gesucht</label></div>
+          <div class="option-item" data-value="kooperation"><input type="radio" name="b4_status" value="kooperation" id="b4s4"><label for="b4s4">Die Kursleitung wird über eine Kooperation gestellt</label></div>
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Kursleitende/Dozierende, Mikroebene</div>
+      </div>
+
+      <!-- KL detail fields, shown when status = fest or kandidaten -->
+      <div id="b4_kl_details" style="display:none;">
+        <div class="field">
+          <span class="field-label">Name oder Kürzel</span>
+          <input type="text" id="b4_kl_name" placeholder="z. B. Frau M.">
+        </div>
+        <div class="field">
+          <span class="field-label">Über welches Fachwissen im Bereich finanzieller Bildung verfügt diese Person?</span>
+          <textarea id="b4_kl_fachwissen" placeholder="Themenfelder, Spezialisierungen …"></textarea>
+          <div class="field-source">Qualitätsleitfaden: Fachwissen finanzielle Bildung, Mikroebene</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Ist das Fachwissen nachgewiesen?</span>
+          <div class="option-group" data-name="b4_nachweis">
+            <div class="option-item" data-value="qualifizierung"><input type="radio" name="b4_nachweis" value="qualifizierung" id="b4n1"><label for="b4n1">Qualifizierung oder Fortbildung</label></div>
+            <div class="option-item" data-value="studium"><input type="radio" name="b4_nachweis" value="studium" id="b4n2"><label for="b4n2">Studium im relevanten Fachgebiet</label></div>
+            <div class="option-item" data-value="berufserfahrung"><input type="radio" name="b4_nachweis" value="berufserfahrung" id="b4n3"><label for="b4n3">Berufserfahrung im Finanzbereich</label></div>
+            <div class="option-item" data-value="persoenlich"><input type="radio" name="b4_nachweis" value="persoenlich" id="b4n4"><label for="b4n4">Keine formalen Nachweise, Einschätzung durch persönlichen Kontakt</label></div>
+            <div class="option-item" data-value="unbekannt"><input type="radio" name="b4_nachweis" value="unbekannt" id="b4n5"><label for="b4n5">Nicht bekannt</label></div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Verfügt die Person über erwachsenenpädagogische Erfahrung?</span>
+          <div class="option-group" data-name="b4_paed">
+            <div class="option-item" data-value="qualifikation"><input type="radio" name="b4_paed" value="qualifikation" id="b4p1"><label for="b4p1">Ja, erwachsenenpädagogische Qualifikation</label></div>
+            <div class="option-item" data-value="erfahrung"><input type="radio" name="b4_paed" value="erfahrung" id="b4p2"><label for="b4p2">Ja, Lehrerfahrung ohne formale Qualifikation</label></div>
+            <div class="option-item" data-value="nein"><input type="radio" name="b4_paed" value="nein" id="b4p3"><label for="b4p3">Nein</label></div>
+            <div class="option-item" data-value="paed_unbekannt"><input type="radio" name="b4_paed" value="paed_unbekannt" id="b4p4"><label for="b4p4">Nicht bekannt</label></div>
+          </div>
+          <div class="field-source">Qualitätsleitfaden: Erwachsenenpädagogische Kompetenzen, Mikroebene</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Verdient diese Person Geld mit Finanz- oder Beratungsprodukten?</span>
+          <span class="field-hint">Z. B. durch eine Tätigkeit bei einer Bank, Versicherung oder einem Finanzvertrieb</span>
+          <div class="option-group" data-name="b4_abh">
+            <div class="option-item" data-value="nein"><input type="radio" name="b4_abh" value="nein" id="b4a1"><label for="b4a1">Nein</label></div>
+            <div class="option-item" data-value="ja"><input type="radio" name="b4_abh" value="ja" id="b4a2"><label for="b4a2">Ja</label></div>
+            <div class="option-item" data-value="abh_unbekannt"><input type="radio" name="b4_abh" value="abh_unbekannt" id="b4a3"><label for="b4a3">Nicht bekannt</label></div>
+          </div>
+          <div class="followup" id="b4_abh_followup">
+            <span class="field-label">Welche Vereinbarungen zum Umgang wurden getroffen?</span>
+            <span class="field-hint">Mehrfachnennung möglich</span>
+            <div class="option-group">
+              <div class="option-item"><input type="checkbox" name="b4_vereinbarung" value="werbeverbot" id="b4v1"><label for="b4v1">Werbeverbot in der Veranstaltung</label></div>
+              <div class="option-item"><input type="checkbox" name="b4_vereinbarung" value="beratungsausschluss" id="b4v2"><label for="b4v2">Ausschluss von Beratungen im Anschluss</label></div>
+              <div class="option-item"><input type="checkbox" name="b4_vereinbarung" value="leitbild" id="b4v3"><label for="b4v3">Bekenntnis zum Leitbild der Einrichtung</label></div>
+              <div class="option-item"><input type="checkbox" name="b4_vereinbarung" value="transparenz" id="b4v4"><label for="b4v4">Transparenz in der Ausschreibung</label></div>
+              <div class="option-item"><input type="checkbox" name="b4_vereinbarung" value="keine_vereinbarung" id="b4v5"><label for="b4v5">Keine Vereinbarung getroffen</label></div>
+            </div>
+          </div>
+          <div class="field-source">Qualitätsleitfaden: Klärung bestehender Abhängigkeiten, Mikroebene</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Honorarvorstellung dieser Person</span>
+          <input type="text" id="b4_kl_honorar" placeholder="z. B. 40 €/UE">
+        </div>
+        <div class="field">
+          <span class="field-label">Woher stammt der Kontakt?</span>
+          <div class="option-group" data-name="b4_kontakt">
+            <div class="option-item" data-value="netzwerk"><input type="radio" name="b4_kontakt" value="netzwerk" id="b4k1"><label for="b4k1">Eigenes Netzwerk</label></div>
+            <div class="option-item" data-value="empfehlung"><input type="radio" name="b4_kontakt" value="empfehlung" id="b4k2"><label for="b4k2">Empfehlung</label></div>
+            <div class="option-item" data-value="selbst"><input type="radio" name="b4_kontakt" value="selbst" id="b4k3"><label for="b4k3">Person hat sich selbst gemeldet</label></div>
+            <div class="option-item" data-value="koop_partner"><input type="radio" name="b4_kontakt" value="koop_partner" id="b4k4"><label for="b4k4">Kooperationspartner</label></div>
+          </div>
+          <div class="field-source">Qualitätsleitfaden: Kursleitenden-Akquise, Mesoebene</div>
+        </div>
+      </div>
+
+      <!-- Shown when status = suche -->
+      <div id="b4_suche_hint" style="display:none;">
+        <div class="hint-banner">Aus Ihren bisherigen Angaben ergibt sich folgendes Anforderungsprofil. Es wird in der Checkliste offener Klärungen dokumentiert.</div>
+        <div class="field">
+          <span class="field-label">Anforderungsprofil (automatisch)</span>
+          <div id="b4_profil_auto" class="output-text" style="margin-top:0;"></div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-secondary" onclick="goTo(3)">Zurück</button>
+        <button class="btn btn-primary" onclick="goTo(5)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- ====== BLOCK 5: Rahmenbedingungen ====== -->
+    <div class="block" id="block-5">
+      <div class="block-head">
+        <div class="block-number">Schritt 5 von 5</div>
+        <h2>Rahmenbedingungen</h2>
+        <p class="block-intro">Ressourcen, Infrastruktur, Kooperationen und Verortung in Ihrer Einrichtung.</p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Welches Budget steht zur Verfügung?</span>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          <div><span class="field-hint">Honorar Kursleitung</span><input type="text" id="b5_honorar" placeholder="z. B. 600 € gesamt"></div>
+          <div><span class="field-hint">Sachkosten</span><input type="text" id="b5_sachkosten" placeholder="Optional"></div>
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Ressourcen, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Sind geeignete Räume vorhanden?</span>
+        <div class="option-group" data-name="b5_raum">
+          <div class="option-item" data-value="ja"><input type="radio" name="b5_raum" value="ja" id="b5r1"><label for="b5r1">Ja</label></div>
+          <div class="option-item" data-value="nein"><input type="radio" name="b5_raum" value="nein" id="b5r2"><label for="b5r2">Nein, müssen noch organisiert werden</label></div>
+          <div class="option-item" data-value="entfaellt"><input type="radio" name="b5_raum" value="entfaellt" id="b5r3"><label for="b5r3">Entfällt (reines Online-Angebot)</label></div>
+        </div>
+        <div class="followup" id="b5_raum_followup">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="option-item"><input type="checkbox" name="b5_raum_detail" value="barrierefrei" id="b5rd1"><label for="b5rd1">Barrierearm oder barrierefrei</label></div>
+            <div class="option-item"><input type="checkbox" name="b5_raum_detail" value="oepnv" id="b5rd2"><label for="b5rd2">Mit öffentlichen Verkehrsmitteln erreichbar</label></div>
+          </div>
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Infrastruktur, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Wo ist das Angebot in Ihrem Programm verortet?</span>
+        <input type="text" id="b5_verortung" placeholder="z. B. Fachbereich Gesellschaft, Querschnittsthema">
+        <div class="field-source">Qualitätsleitfaden: Inhalte und Zuständigkeiten, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Wer ist für dieses Angebot zuständig?</span>
+        <div class="option-group" data-name="b5_zustaendig">
+          <div class="option-item" data-value="allein"><input type="radio" name="b5_zustaendig" value="allein" id="b5z1"><label for="b5z1">Ich allein</label></div>
+          <div class="option-item" data-value="gemeinsam"><input type="radio" name="b5_zustaendig" value="gemeinsam" id="b5z2"><label for="b5z2">Ich gemeinsam mit Kolleg:innen</label></div>
+          <div class="option-item" data-value="andere"><input type="radio" name="b5_zustaendig" value="andere" id="b5z3"><label for="b5z3">Eine andere Person, ich unterstütze</label></div>
+          <div class="option-item" data-value="ungeklaert"><input type="radio" name="b5_zustaendig" value="ungeklaert" id="b5z4"><label for="b5z4">Noch ungeklärt</label></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Arbeiten Sie mit Kooperationspartner:innen zusammen?</span>
+        <div class="option-group" data-name="b5_koop">
+          <div class="option-item" data-value="bestehend"><input type="radio" name="b5_koop" value="bestehend" id="b5ko1"><label for="b5ko1">Ja, bestehende Kooperation</label></div>
+          <div class="option-item" data-value="geplant"><input type="radio" name="b5_koop" value="geplant" id="b5ko2"><label for="b5ko2">Ja, neue Kooperation in Planung</label></div>
+          <div class="option-item" data-value="koop_nein"><input type="radio" name="b5_koop" value="koop_nein" id="b5ko3"><label for="b5ko3">Nein</label></div>
+        </div>
+        <div class="followup" id="b5_koop_followup">
+          <span class="field-label">Wer ist der Kooperationspartner?</span>
+          <input type="text" id="b5_koop_partner" placeholder="Name oder Art der Einrichtung">
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Kooperationen, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Gibt es im Einzugsgebiet bereits ähnliche Angebote anderer Träger?</span>
+        <div class="option-group" data-name="b5_konkurrenz">
+          <div class="option-item" data-value="ja_bekannt"><input type="radio" name="b5_konkurrenz" value="ja_bekannt" id="b5x1"><label for="b5x1">Ja, bekannte Angebote</label></div>
+          <div class="option-item" data-value="konk_nein"><input type="radio" name="b5_konkurrenz" value="konk_nein" id="b5x2"><label for="b5x2">Nein</label></div>
+          <div class="option-item" data-value="konk_unbekannt"><input type="radio" name="b5_konkurrenz" value="konk_unbekannt" id="b5x3"><label for="b5x3">Nicht bekannt</label></div>
+        </div>
+        <div class="followup" id="b5_konk_followup">
+          <span class="field-label">Welche Angebote sind bekannt?</span>
+          <textarea id="b5_konk_details" placeholder="Einrichtung, Art des Angebots …"></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Soll Beratung Teil des Angebots sein?</span>
+        <div class="option-group" data-name="b5_beratung">
+          <div class="option-item" data-value="integriert"><input type="radio" name="b5_beratung" value="integriert" id="b5b1"><label for="b5b1">Ja, integriert in das Angebot</label></div>
+          <div class="option-item" data-value="verweis"><input type="radio" name="b5_beratung" value="verweis" id="b5b2"><label for="b5b2">Ja, als Verweis auf bestehende Beratungsangebote</label></div>
+          <div class="option-item" data-value="beratung_nein"><input type="radio" name="b5_beratung" value="beratung_nein" id="b5b3"><label for="b5b3">Nein</label></div>
+          <div class="option-item" data-value="beratung_offen"><input type="radio" name="b5_beratung" value="beratung_offen" id="b5b4"><label for="b5b4">Noch offen</label></div>
+        </div>
+        <div class="field-source">Qualitätsleitfaden: Beratung, Mesoebene</div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Wie viele Teilnehmende erwarten Sie?</span>
+        <input type="number" id="b5_tn" min="1" placeholder="z. B. 12">
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-secondary" onclick="goTo(4)">Zurück</button>
+        <button class="btn btn-primary" onclick="generateResults()">Ergebnisse erzeugen</button>
+      </div>
+    </div>
+
+    <!-- ====== RESULTS ====== -->
+    <div class="results-section" id="results">
+      <div class="block-head">
+        <div class="block-number">Ergebnis</div>
+        <h2 id="results-title">Ihre Planungsdokumente</h2>
+        <p class="block-intro">Alle Dokumente basieren auf Ihren Eingaben. Klicken Sie auf ein Dokument, um es aufzuklappen.</p>
+      </div>
+
+      <div id="output-cards"></div>
+
+      <!-- Sharing -->
+      <div class="share-section" id="shareSection">
+        <h3>Ergebnisse teilen</h3>
+        <p class="share-intro">Sie können ausgewählte Teile Ihrer Planung für andere Planende freigeben. Die Freigabe ist freiwillig. Personennamen und Budgetangaben werden automatisch entfernt.</p>
+        <div class="share-check">
+          <input type="checkbox" id="share_ae"><label for="share_ae">Ausschreibungsentwurf<br><span class="share-desc">Der Entwurfstext, wie er in einer Veröffentlichung erscheinen könnte.</span></label>
+        </div>
+        <div class="share-check">
+          <input type="checkbox" id="share_zp"><label for="share_zp">Zielgruppenprofil (anonymisiert)<br><span class="share-desc">Zielgruppenbeschreibung mit Konsequenzen für Inhalt, Format und Methode.</span></label>
+        </div>
+        <div class="share-check">
+          <input type="checkbox" id="share_notiz"><label for="share_notiz">Erfahrungsnotiz (nach Durchführung)<br><span class="share-desc">Eigene Hinweise, was funktioniert hat und was nicht.</span></label>
+        </div>
+        <div class="followup visible" id="share_notiz_field" style="display:none;">
+          <span class="field-label">Ihre Erfahrungsnotiz</span>
+          <textarea id="share_notiz_text" placeholder="Dieses Feld können Sie nach der Durchführung ausfüllen."></textarea>
+        </div>
+        <div style="margin-top:12px;">
+          <span class="field-label">Ansprechperson (optional)</span>
+          <span class="field-hint">Wird auf der Karte im Materialpool angezeigt, falls Sie erkennbar sein möchten.</span>
+          <input type="text" id="share_kontakt" placeholder="z. B. Frau Müller, m.mueller@vhs-beispiel.de" style="margin-top:4px;">
+        </div>
+        <div style="margin-top:8px;">
+          <span class="field-label">Einrichtungsname (optional)</span>
+          <input type="text" id="share_einrichtung" placeholder="z. B. VHS Musterstadt">
+        </div>
+        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="downloadShare()">Material zur Freigabe einreichen</button>
+          <button class="btn btn-secondary" onclick="downloadAll()">Alle Ergebnisse herunterladen</button>
+        </div>
+        <p style="font-size:11px;color:var(--text-light);margin-top:8px;">Die Freigabe erzeugt eine Datei, die Sie per E-Mail an die Redaktion des Materialpools senden. Erst nach Prüfung und Freigabe erscheint Ihr Beitrag auf dem Whiteboard.</p>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-secondary" onclick="goTo(5)">Zurück zur Bearbeitung</button>
+        <button class="btn btn-ghost" onclick="window.print()">Drucken</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ STATE & NAVIGATION ============
+const BLOCK_NAMES = ['Was planen Sie?', 'Zielgruppe', 'Wirkung & Didaktik', 'Kursleitung', 'Rahmen'];
+let currentBlock = 0;
+
+function startAssistant() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wizard').style.display = 'block';
+  buildProgress();
+  goTo(1);
+}
+
+function buildProgress() {
+  const labels = document.getElementById('progressLabels');
+  const bar = document.getElementById('progressBar');
+  labels.innerHTML = BLOCK_NAMES.map((n, i) =>
+    `<div class="progress-label" data-idx="${i+1}" onclick="goTo(${i+1})">${n}</div>`
+  ).join('');
+  bar.innerHTML = BLOCK_NAMES.map((_, i) =>
+    `<div class="progress-segment" data-idx="${i+1}"></div>`
+  ).join('');
+}
+
+function goTo(n) {
+  currentBlock = n;
+  document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.results-section').forEach(b => b.classList.remove('active'));
+  const block = document.getElementById('block-' + n);
+  if (block) {
+    block.classList.add('active');
+    // Update conditional displays when entering block
+    if (n === 4) updateBlock4();
+  }
+  updateProgress();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function updateProgress() {
+  document.querySelectorAll('.progress-segment').forEach(s => {
+    const idx = parseInt(s.dataset.idx);
+    s.classList.toggle('done', idx < currentBlock);
+    s.classList.toggle('active', idx === currentBlock);
+  });
+  document.querySelectorAll('.progress-label').forEach(l => {
+    const idx = parseInt(l.dataset.idx);
+    l.classList.toggle('done', idx < currentBlock);
+    l.classList.toggle('active', idx === currentBlock);
+  });
+}
+
+// ============ CONDITIONAL LOGIC ============
+// Block 1: Förderprogramm followup
+document.querySelectorAll('input[name="b1_anlass"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const checked = document.querySelector('input[name="b1_anlass"][value="foerderung"]')?.checked;
+    toggleFollowup('b1_foerder_followup', checked);
+  });
+});
+
+// Block 2: Zielgruppenfassung followups
+document.querySelectorAll('input[name="b2_fassung"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    toggleFollowup('b2_vorgabe_followup', document.querySelector('input[name="b2_fassung"][value="vorgegeben"]')?.checked);
+    toggleFollowup('b2_keine_followup', document.querySelector('input[name="b2_fassung"][value="keine"]')?.checked);
+  });
+});
+
+// Block 2: Kultur followup
+document.querySelectorAll('input[name="b2_kultur"]').forEach(r => {
+  r.addEventListener('change', () => {
+    toggleFollowup('b2_kultur_followup', r.value === 'ja_bekannt' && r.checked);
+  });
+});
+
+// Block 3: Trend followup
+document.querySelectorAll('input[name="b3_trend"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    toggleFollowup('b3_trend_followup', document.querySelector('input[name="b3_trend"][value="anderer"]')?.checked);
+  });
+});
+
+// Block 4: KL status
+document.querySelectorAll('input[name="b4_status"]').forEach(r => {
+  r.addEventListener('change', updateBlock4);
+});
+
+function updateBlock4() {
+  const status = getRadio('b4_status');
+  const showDetails = (status === 'fest' || status === 'kandidaten');
+  document.getElementById('b4_kl_details').style.display = showDetails ? 'block' : 'none';
+  document.getElementById('b4_suche_hint').style.display = (status === 'suche') ? 'block' : 'none';
+  if (status === 'suche') {
+    const wirkung = getRadio('b3_wirkung');
+    const zg = document.getElementById('b2_zielgruppe')?.value || '(noch nicht definiert)';
+    const wMap = {informierend:'Fachwissen und Vermittlungskompetenz', reflektierend:'Sensibilität für die Zielgruppe und Moderationskompetenz', anwendungsorientiert:'Praxiserfahrung und Methodenkompetenz'};
+    document.getElementById('b4_profil_auto').textContent =
+      `Zielgruppe: ${zg}\nSchwerpunkt: ${wMap[wirkung] || '(Wirkungsrichtung noch nicht festgelegt)'}\nUnabhängigkeit: möglichst keine Abhängigkeiten von Finanzprodukten`;
+  }
+}
+
+// Block 4: Abhängigkeit followup
+document.querySelectorAll('input[name="b4_abh"]').forEach(r => {
+  r.addEventListener('change', () => toggleFollowup('b4_abh_followup', r.value === 'ja' && r.checked));
+});
+
+// Block 5: Raum followup
+document.querySelectorAll('input[name="b5_raum"]').forEach(r => {
+  r.addEventListener('change', () => toggleFollowup('b5_raum_followup', r.value === 'ja' && r.checked));
+});
+
+// Block 5: Kooperation followup
+document.querySelectorAll('input[name="b5_koop"]').forEach(r => {
+  r.addEventListener('change', () => toggleFollowup('b5_koop_followup', (r.value === 'bestehend' || r.value === 'geplant') && r.checked));
+});
+
+// Block 5: Konkurrenz followup
+document.querySelectorAll('input[name="b5_konkurrenz"]').forEach(r => {
+  r.addEventListener('change', () => toggleFollowup('b5_konk_followup', r.value === 'ja_bekannt' && r.checked));
+});
+
+// Share: Notiz field
+document.getElementById('share_notiz').addEventListener('change', function() {
+  document.getElementById('share_notiz_field').style.display = this.checked ? 'block' : 'none';
+});
+
+// Option item selection styling
+document.querySelectorAll('.option-item').forEach(item => {
+  const input = item.querySelector('input');
+  if (!input) return;
+  input.addEventListener('change', () => {
+    if (input.type === 'radio') {
+      item.closest('.option-group').querySelectorAll('.option-item').forEach(oi => oi.classList.remove('selected'));
+    }
+    item.classList.toggle('selected', input.checked);
+  });
+});
+
+function toggleFollowup(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('visible', show);
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+// ============ HELPERS ============
+function getRadio(name) {
+  const r = document.querySelector(`input[name="${name}"]:checked`);
+  return r ? r.value : '';
+}
+function getChecked(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
+}
+function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+// ============ GENERATE RESULTS ============
+function generateResults() {
+  const d = collectData();
+  const outputs = buildOutputs(d);
+  renderOutputs(outputs);
+
+  document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+  document.getElementById('results').classList.add('active');
+  document.getElementById('results-title').textContent = d.titel ? `Planungsdokumente: ${d.titel}` : 'Ihre Planungsdokumente';
+  currentBlock = 6;
+  updateProgress();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function collectData() {
+  return {
+    titel: val('b1_titel'),
+    art: getRadio('b1_art'),
+    anlass: getChecked('b1_anlass'),
+    foerder_details: val('b1_foerder_details'),
+    vorgaben: val('b1_vorgaben'),
+    zielgruppe: val('b2_zielgruppe'),
+    fassung: getChecked('b2_fassung'),
+    vorgabe_details: val('b2_vorgabe_details'),
+    keine_grund: val('b2_keine_grund'),
+    bedarfe: val('b2_bedarfe'),
+    quellen: getChecked('b2_quelle'),
+    kultur: getRadio('b2_kultur'),
+    kultur_details: val('b2_kultur_details'),
+    konseq_inhalt: val('b2_konseq_inhalt'),
+    konseq_format: val('b2_konseq_format'),
+    konseq_methode: val('b2_konseq_methode'),
+    lernziel: val('b3_lernziel'),
+    wirkung: getRadio('b3_wirkung'),
+    trends: getChecked('b3_trend'),
+    trend_anderes: val('b3_trend_anderes'),
+    format: getRadio('b3_format'),
+    ue: val('b3_ue'),
+    lernform: getRadio('b3_lernform'),
+    kl_status: getRadio('b4_status'),
+    kl_name: val('b4_kl_name'),
+    kl_fachwissen: val('b4_kl_fachwissen'),
+    kl_nachweis: getRadio('b4_nachweis'),
+    kl_paed: getRadio('b4_paed'),
+    kl_abh: getRadio('b4_abh'),
+    kl_vereinbarungen: getChecked('b4_vereinbarung'),
+    kl_honorar: val('b4_kl_honorar'),
+    kl_kontakt: getRadio('b4_kontakt'),
+    honorar: val('b5_honorar'),
+    sachkosten: val('b5_sachkosten'),
+    raum: getRadio('b5_raum'),
+    raum_details: getChecked('b5_raum_detail'),
+    verortung: val('b5_verortung'),
+    zustaendig: getRadio('b5_zustaendig'),
+    koop: getRadio('b5_koop'),
+    koop_partner: val('b5_koop_partner'),
+    konkurrenz: getRadio('b5_konkurrenz'),
+    konk_details: val('b5_konk_details'),
+    beratung: getRadio('b5_beratung'),
+    tn: val('b5_tn')
+  };
+}
+
+function buildOutputs(d) {
+  const risks = [];
+  const checks = [];
+
+  // Labels
+  const artL = {neu:'Neues Angebot', wiederholung:'Wiederholung', weiterentwicklung:'Weiterentwicklung'};
+  const anlassL = {rueckmeldungen:'Rückmeldungen von Teilnehmenden', beobachtung:'Eigene Beobachtung', auftrag:'Auftrag des Trägers', foerderung:'Förderprogramm', kooperation:'Anfrage Kooperationspartner', eigeninteresse:'Eigenes Interesse'};
+  const wirkungL = {informierend:'Informierend', reflektierend:'Reflektierend', anwendungsorientiert:'Anwendungsorientiert'};
+  const formatL = {einzelveranstaltung:'Einzelveranstaltung', reihe:'Reihe/Kurs', internat:'Veranstaltung mit Unterbringung', offen:'Noch offen'};
+  const lernformL = {praesenz:'Präsenz', online_synchron:'Online synchron', hybrid:'Hybrid', blended:'Blended Learning', lernform_offen:'Noch offen'};
+  const trendL = {vorsorge:'Individualisierung der Altersvorsorge', sicherheit:'Sicherheit im digitalen Raum', digital:'Digitale Währungen', bargeld:'Abschaffung von Bargeld', keinen:'Keinen bestimmten Trend'};
+
+  // ---- Risk assessment ----
+  if (!d.lernziel) { risks.push({label:'Lernziel', color:'yellow', text:'Noch nicht formuliert'}); checks.push('Lernziel formulieren'); }
+  else risks.push({label:'Lernziel', color:'green', text:'Formuliert'});
+
+  if (!d.zielgruppe) { risks.push({label:'Zielgruppe', color:'yellow', text:'Noch nicht beschrieben'}); checks.push('Zielgruppe beschreiben'); }
+  else risks.push({label:'Zielgruppe', color:'green', text:'Beschrieben'});
+
+  if (d.quellen.includes('annahme')) { risks.push({label:'Bedarfsgrundlage', color:'yellow', text:'Beruht auf Annahme'}); checks.push('Bedarfe der Zielgruppe überprüfen'); }
+  else if (!d.bedarfe) { risks.push({label:'Bedarfsgrundlage', color:'yellow', text:'Noch nicht erhoben'}); checks.push('Bedarfe der Zielgruppe erheben'); }
+  else risks.push({label:'Bedarfsgrundlage', color:'green', text:'Vorhanden'});
+
+  if (d.kultur === 'vermutlich' || d.kultur === 'unklar') { risks.push({label:'Kulturelle Aspekte', color:'yellow', text:'Noch zu klären'}); checks.push('Kulturelle/religiöse Aspekte im Umgang mit Geld klären'); }
+  else risks.push({label:'Kulturelle Aspekte', color:'green', text:d.kultur === 'ja_bekannt' ? 'Berücksichtigt' : 'Nicht relevant'});
+
+  if (d.kl_status === 'suche') { risks.push({label:'Kursleitung', color:'yellow', text:'Wird noch gesucht'}); checks.push('Kursleitung akquirieren (Anforderungsprofil liegt vor)'); }
+  else if (d.kl_abh === 'ja' && d.kl_vereinbarungen.includes('keine_vereinbarung')) { risks.push({label:'Unabhängigkeit KL', color:'red', text:'Abhängigkeit ohne Vereinbarung'}); checks.push('Vereinbarung zum Umgang mit Abhängigkeit treffen'); }
+  else if (d.kl_abh === 'abh_unbekannt') { risks.push({label:'Unabhängigkeit KL', color:'yellow', text:'Noch nicht geklärt'}); checks.push('Klären, ob Abhängigkeiten der Kursleitung bestehen'); }
+  else if (d.kl_abh === 'ja') risks.push({label:'Unabhängigkeit KL', color:'yellow', text:'Abhängigkeit mit Vereinbarung'});
+  else risks.push({label:'Unabhängigkeit KL', color:'green', text:'Keine Abhängigkeit'});
+
+  if (d.kl_nachweis === 'unbekannt') { risks.push({label:'Fachwissen KL', color:'yellow', text:'Nicht bekannt'}); checks.push('Fachwissen der Kursleitung klären'); }
+  else risks.push({label:'Fachwissen KL', color:'green', text:'Nachgewiesen'});
+
+  if (d.raum === 'nein') { risks.push({label:'Räume', color:'yellow', text:'Noch zu organisieren'}); checks.push('Geeignete Räume organisieren'); }
+  else risks.push({label:'Räume', color:'green', text: d.raum === 'entfaellt' ? 'Entfällt (online)' : 'Vorhanden'});
+
+  if (d.zustaendig === 'ungeklaert') { risks.push({label:'Zuständigkeit', color:'yellow', text:'Noch ungeklärt'}); checks.push('Zuständigkeit für das Angebot klären'); }
+  else risks.push({label:'Zuständigkeit', color:'green', text:'Geklärt'});
+
+  // ---- 1. Angebotsbeschreibung ----
+  let ab = `${d.titel || '(Arbeitstitel fehlt)'}\n\n`;
+  ab += `Art: ${artL[d.art] || '–'}\n`;
+  ab += `Anlass: ${d.anlass.map(a => anlassL[a]).join(', ') || '–'}\n`;
+  if (d.vorgaben) ab += `Zeitliche/institutionelle Vorgaben: ${d.vorgaben}\n`;
+  ab += `\nZielgruppe: ${d.zielgruppe || '(noch nicht definiert)'}\n`;
+  ab += `Bedarfe: ${d.bedarfe || '(noch nicht erhoben)'}\n`;
+  ab += `\nLernziel: ${d.lernziel || '(noch nicht formuliert)'}\n`;
+  ab += `Wirkungsrichtung: ${wirkungL[d.wirkung] || '–'}\n`;
+  ab += `Format: ${formatL[d.format] || '–'}`;
+  if (d.ue) ab += `, ${d.ue} UE`;
+  ab += `\nLernform: ${lernformL[d.lernform] || '–'}\n`;
+  if (d.trends.length && !d.trends.includes('keinen')) {
+    ab += `Gesellschaftlicher Bezug: ${d.trends.map(t => t === 'anderer' ? d.trend_anderes : trendL[t]).filter(Boolean).join(', ')}\n`;
+  }
+  ab += `\nVerortung: ${d.verortung || '–'}\n`;
+  if (d.koop !== 'koop_nein' && d.koop_partner) ab += `Kooperation: ${d.koop_partner}\n`;
+  if (d.beratung && d.beratung !== 'beratung_nein') ab += `Beratung: ${d.beratung === 'integriert' ? 'integriert' : 'als Verweisberatung'}\n`;
+  if (d.tn) ab += `Erwartete Teilnehmende: ${d.tn}\n`;
+
+  // ---- 2. Zielgruppenprofil ----
+  let zp = `Zielgruppe: ${d.zielgruppe || '(noch nicht definiert)'}\n\n`;
+  if (d.fassung.length) {
+    const fassungL = {lebensphase:'Lebensphase', lebenswelt:'Lebenswelt/Milieu', soziodemografie:'Soziodemographie', zugang:'Einrichtungszugang', vorgegeben:'Fördergeber-Vorgabe', keine:'Keine explizite Ansprache'};
+    zp += `Zielgruppenfassung: ${d.fassung.map(f => fassungL[f]).join(', ')}\n`;
+  }
+  zp += `\nBekannte Bedarfe: ${d.bedarfe || '(noch nicht erhoben)'}\n`;
+  if (d.quellen.length) {
+    const quellenL = {evaluation:'Evaluation', muendlich:'Mündliche Rückmeldung', beobachtung:'Eigene Beobachtung', studien:'Studien', annahme:'Annahme'};
+    zp += `Grundlage: ${d.quellen.map(q => quellenL[q]).join(', ')}\n`;
+  }
+  if (d.kultur === 'ja_bekannt' && d.kultur_details) zp += `\nKulturelle/religiöse Aspekte: ${d.kultur_details}\n`;
+  else if (d.kultur === 'vermutlich') zp += `\nKulturelle/religiöse Aspekte: vermutlich relevant, noch nicht erhoben\n`;
+  zp += `\nKonsequenzen für die Inhalte: ${d.konseq_inhalt || '–'}\n`;
+  zp += `Konsequenzen für das Format: ${d.konseq_format || '–'}\n`;
+  zp += `Konsequenzen für Ansprache/Methode: ${d.konseq_methode || '–'}\n`;
+
+  // ---- 3. Ausschreibungsentwurf ----
+  let ae = buildAusschreibung(d, formatL, lernformL, trendL);
+
+  // ---- 4. Kursleitenden-Prüfung ----
+  let kp = '';
+  if (d.kl_status === 'suche') {
+    kp = 'Kursleitung wird noch gesucht.\n\nAnforderungsprofil:\n';
+    kp += `Zielgruppe: ${d.zielgruppe || '–'}\n`;
+    const wReq = {informierend:'Fachwissen und Vermittlungskompetenz', reflektierend:'Sensibilität und Moderationskompetenz', anwendungsorientiert:'Praxiserfahrung und Methodenkompetenz'};
+    kp += `Schwerpunkt: ${wReq[d.wirkung] || '–'}\n`;
+    kp += 'Unabhängigkeit: möglichst keine Abhängigkeiten von Finanzprodukten\n';
+  } else if (d.kl_name) {
+    kp = `Kursleitung: ${d.kl_name}\n\n`;
+    kp += `Fachwissen: ${d.kl_fachwissen || '–'}\n`;
+    const nachweisL = {qualifizierung:'Qualifizierung/Fortbildung', studium:'Studium', berufserfahrung:'Berufserfahrung', persoenlich:'Persönliche Einschätzung', unbekannt:'Nicht bekannt'};
+    kp += `Nachweis: ${nachweisL[d.kl_nachweis] || '–'}\n`;
+    const paedL = {qualifikation:'Erwachsenenpädagogische Qualifikation', erfahrung:'Lehrerfahrung', nein:'Nein', paed_unbekannt:'Nicht bekannt'};
+    kp += `Pädagogische Kompetenz: ${paedL[d.kl_paed] || '–'}\n`;
+    kp += `Passung zur Zielgruppe: zu prüfen gegen Zielgruppenprofil\n`;
+    kp += `\nUnabhängigkeit: ${d.kl_abh === 'nein' ? 'Keine Abhängigkeit' : d.kl_abh === 'ja' ? 'Abhängigkeit vorhanden' : 'Noch nicht geklärt'}\n`;
+    if (d.kl_abh === 'ja') {
+      const vL = {werbeverbot:'Werbeverbot', beratungsausschluss:'Beratungsausschluss', leitbild:'Leitbild-Bekenntnis', transparenz:'Transparenz in Ausschreibung', keine_vereinbarung:'Keine Vereinbarung'};
+      kp += `Vereinbarungen: ${d.kl_vereinbarungen.map(v => vL[v]).join(', ') || '–'}\n`;
+    }
+    kp += `\nHonorar: ${d.kl_honorar || '–'}\n`;
+    if (d.honorar) kp += `Verfügbares Budget: ${d.honorar}\n`;
+    const kontaktL = {netzwerk:'Eigenes Netzwerk', empfehlung:'Empfehlung', selbst:'Eigeninitiative', koop_partner:'Kooperationspartner'};
+    kp += `Kontaktherkunft: ${kontaktL[d.kl_kontakt] || '–'}\n`;
+  } else {
+    kp = '(Keine Angaben zur Kursleitung)';
+  }
+
+  // ---- 5. Risikoampel ----
+  const redCount = risks.filter(r => r.color === 'red').length;
+  const yellowCount = risks.filter(r => r.color === 'yellow').length;
+  let raTag = 'tag-green', raLabel = 'Vollständig';
+  if (redCount > 0) { raTag = 'tag-red'; raLabel = `${redCount} Risiko${redCount > 1 ? 'en' : ''}`; }
+  else if (yellowCount > 0) { raTag = 'tag-yellow'; raLabel = `${yellowCount} offen`; }
+
+  // ---- 6. Checkliste ----
+  let ck = checks.length ? checks.map((c, i) => `${i + 1}. ${c}`).join('\n') : 'Keine offenen Klärungen.';
+
+  // ---- 7. Qualitätsdokumentation ----
+  let qd = `Qualitätsdokumentation\n${d.titel || '–'}\n${'='.repeat(40)}\n\n`;
+  qd += `Art: ${artL[d.art] || '–'}\n`;
+  qd += `Anlass: ${d.anlass.map(a => anlassL[a]).join(', ') || '–'}\n`;
+  qd += `Wirkungsrichtung: ${wirkungL[d.wirkung] || '–'}\n`;
+  qd += `Zielgruppenfassung: ${d.fassung.join(', ') || '–'}\n`;
+  qd += `Verortung im Programm: ${d.verortung || '–'}\n`;
+  const zustL = {allein:'Alleinzuständig', gemeinsam:'Gemeinsam mit Kolleg:innen', andere:'Unterstützend', ungeklaert:'Ungeklärt'};
+  qd += `Zuständigkeit: ${zustL[d.zustaendig] || '–'}\n`;
+  qd += `Kooperation: ${d.koop === 'koop_nein' ? 'Nein' : d.koop_partner || 'Ja'}\n`;
+  if (d.konkurrenz === 'ja_bekannt') qd += `Ähnliche Angebote im Sozialraum: ${d.konk_details}\n`;
+  qd += `\nLeitfaden-Bezüge:\n`;
+  qd += `- Zielgruppenwissen und -Kenntnisse (Mesoebene)\n`;
+  qd += `- Bedarfe und Bedarfserschließung (Mesoebene)\n`;
+  qd += `- Didaktische Gestaltung (Mesoebene)\n`;
+  qd += `- Kursleitende/Dozierende (Mikroebene)\n`;
+  qd += `- Gesellschaftliche Trends (Makroebene)\n`;
+
+  // ---- 8. Kurzbegründung ----
+  let kb = `Begründung für das Angebot „${d.titel || '–'}"\n\n`;
+  if (d.anlass.length) kb += `Das Angebot entsteht aus: ${d.anlass.map(a => anlassL[a]).join(', ')}.\n\n`;
+  if (d.bedarfe) kb += `In der Zielgruppe (${d.zielgruppe || '–'}) besteht folgender Bedarf: ${d.bedarfe}\n\n`;
+  if (d.trends.length && !d.trends.includes('keinen')) {
+    kb += `Das Angebot greift gesellschaftliche Entwicklungen auf: ${d.trends.map(t => t === 'anderer' ? d.trend_anderes : trendL[t]).filter(Boolean).join(', ')}.\n\n`;
+  }
+  if (d.koop !== 'koop_nein' && d.koop_partner) kb += `Es wird in Kooperation mit ${d.koop_partner} durchgeführt.\n\n`;
+  if (d.konkurrenz === 'ja_bekannt') kb += `Im Sozialraum bestehen bereits Angebote (${d.konk_details}). Das eigene Angebot ergänzt diese durch: (hier spezifizieren).\n`;
+  else if (d.konkurrenz === 'konk_nein') kb += `Im Einzugsgebiet gibt es bisher keine vergleichbaren Angebote.\n`;
+
+  // ---- 9. Gesprächsleitfaden Kursleitung ----
+  let gl = buildGespraechsleitfaden(d);
+
+  return [
+    {id:'ab', title:'Angebotsbeschreibung', tag:raTag === 'tag-red' ? 'tag-yellow' : 'tag-green', tagLabel:'Intern', content:ab, open:true},
+    {id:'zp', title:'Zielgruppenprofil', tag: d.zielgruppe ? 'tag-green' : 'tag-yellow', tagLabel:d.zielgruppe ? 'Vollständig' : 'Unvollständig', content:zp},
+    {id:'ae', title:'Ausschreibungsentwurf', tag:'tag-green', tagLabel:'Entwurf', content:ae},
+    {id:'gl', title:'Gesprächsleitfaden Kursleitung', tag:'tag-green', tagLabel:'Vorgespräch', content:gl},
+    {id:'kp', title:'Kursleitenden-Prüfung', tag: d.kl_status === 'suche' ? 'tag-yellow' : (d.kl_abh === 'ja' && d.kl_vereinbarungen.includes('keine_vereinbarung')) ? 'tag-red' : 'tag-green', tagLabel: d.kl_status === 'suche' ? 'Offen' : 'Geprüft', content:kp},
+    {id:'ra', title:'Risikoampel', tag:raTag, tagLabel:raLabel, content:'', risks:risks},
+    {id:'ck', title:'Checkliste offener Klärungen', tag: checks.length ? 'tag-yellow' : 'tag-green', tagLabel: checks.length ? `${checks.length} Punkt${checks.length > 1 ? 'e' : ''}` : 'Leer', content:ck},
+    {id:'qd', title:'Qualitätsdokumentation', tag:'tag-green', tagLabel:'QM', content:qd},
+    {id:'kb', title:'Kurzbegründung', tag:'tag-green', tagLabel:'Leitung/Fördergeber', content:kb}
+  ];
+}
+
+// ============ AUSSCHREIBUNG & GESPRÄCHSLEITFADEN ============
+function buildAusschreibung(d, formatL, lernformL, trendL) {
+  const titel = d.titel || '[Titel einfügen]';
+  const zg = d.zielgruppe || '[Zielgruppe einfügen]';
+  let text = titel + '\n\n';
+  if (d.zielgruppe && d.bedarfe) {
+    text += `Sie möchten sich mit dem Thema Geld und Finanzen auseinandersetzen, wissen aber nicht, wo Sie anfangen sollen? ${d.bedarfe.charAt(0).toUpperCase() + d.bedarfe.slice(1)} – diese und ähnliche Fragen stehen im Mittelpunkt dieser Veranstaltung.\n\n`;
+  } else if (d.zielgruppe) {
+    text += `Diese Veranstaltung richtet sich an ${zg} und bietet einen fundierten Einstieg in Fragen der persönlichen Finanzen.\n\n`;
+  }
+  if (d.lernziel) {
+    text += `Am Ende der Veranstaltung ${d.lernziel.charAt(0).toLowerCase() + d.lernziel.slice(1)}${d.lernziel.endsWith('.') ? '' : '.'}\n\n`;
+  }
+  if (d.wirkung === 'informierend') {
+    text += 'Die Veranstaltung vermittelt Grundlagenwissen verständlich und praxisnah. Fachbegriffe werden erklärt, Zusammenhänge anschaulich dargestellt. Vorkenntnisse sind nicht erforderlich.\n\n';
+  } else if (d.wirkung === 'reflektierend') {
+    text += 'In einem geschützten Rahmen können Sie Ihre eigene finanzielle Situation einordnen und gemeinsam mit anderen Teilnehmenden reflektieren. Persönliche Fragen werden vertraulich behandelt.\n\n';
+  } else if (d.wirkung === 'anwendungsorientiert') {
+    text += 'Im Mittelpunkt steht das praktische Tun. Sie arbeiten an Ihrer eigenen Situation, entwickeln konkrete nächste Schritte und nehmen Arbeitsmaterialien für den Alltag mit.\n\n';
+  }
+  const activeTrends = (d.trends || []).filter(t => t !== 'keinen');
+  if (activeTrends.length) {
+    const trendTexte = [];
+    if (activeTrends.includes('vorsorge')) trendTexte.push('die zunehmende Eigenverantwortung bei der Altersvorsorge');
+    if (activeTrends.includes('sicherheit')) trendTexte.push('den sicheren Umgang mit Finanzinformationen im Internet');
+    if (activeTrends.includes('digital')) trendTexte.push('neue digitale Zahlungsformen und Geschäftsmodelle');
+    if (activeTrends.includes('bargeld')) trendTexte.push('die Veränderungen im Zahlungsverkehr');
+    if (activeTrends.includes('anderer') && d.trend_anderes) trendTexte.push(d.trend_anderes);
+    if (trendTexte.length) text += `Ein besonderer Schwerpunkt liegt auf ${trendTexte.join(' sowie ')}.\n\n`;
+  }
+  if (d.konseq_methode) {
+    text += `Methodisch setzt die Veranstaltung auf ${d.konseq_methode.charAt(0).toLowerCase() + d.konseq_methode.slice(1)}${d.konseq_methode.endsWith('.') ? '' : '.'}\n\n`;
+  }
+  text += '—\n\n';
+  const ueText = d.ue ? `, ${d.ue} Unterrichtseinheiten à 45 Minuten` : '';
+  text += `Umfang: ${formatL[d.format] || '[Format einfügen]'}${ueText}\n`;
+  text += `Lernform: ${lernformL[d.lernform] || '[Lernform einfügen]'}\n`;
+  if (d.konseq_format) text += `Hinweis: ${d.konseq_format}\n`;
+  text += '\nTermin: [bitte einsetzen]\nOrt: [bitte einsetzen]\n';
+  if (d.kl_name && d.kl_status !== 'suche') text += `Kursleitung: ${d.kl_name}\n`;
+  if (d.kl_abh === 'ja' && d.kl_vereinbarungen.includes('transparenz')) text += 'Die Kursleitung ist auch im Finanzbereich tätig. In der Veranstaltung findet keine Produktberatung und keine Werbung statt.\n';
+  if (d.raum_details && d.raum_details.includes('barrierefrei')) text += 'Der Veranstaltungsort ist barrierearm zugänglich.\n';
+  text += '\nAnmeldung und Information: [bitte einsetzen]\n';
+  if (d.tn) text += `Teilnahmeplätze: ${d.tn}\n`;
+  text += 'Die Teilnahme ist kostenfrei. / Teilnahmegebühr: [bitte einsetzen]\n';
+  return text;
+}
+
+function buildGespraechsleitfaden(d) {
+  const zg = d.zielgruppe || '(noch nicht definiert)';
+  const wMap = {informierend:'Wissen verständlich und korrekt vermitteln', reflektierend:'einen geschützten Rahmen für persönliche Reflexion schaffen', anwendungsorientiert:'praktische Umsetzung im Alltag anleiten'};
+  const schwerpunkt = wMap[d.wirkung] || '(noch nicht festgelegt)';
+  let gl = 'LEITFADEN FÜR DAS VORGESPRÄCH MIT DER KURSLEITUNG\n';
+  gl += `Angebot: ${d.titel || '–'}\nZielgruppe: ${zg}\nDidaktischer Schwerpunkt: ${schwerpunkt}\n`;
+  gl += '\n════════════════════════════════════════\n\n';
+  gl += 'FACHLICHE EIGNUNG\n\n';
+  gl += '→ Welche Themen der finanziellen Bildung kennen Sie aus eigener Erfahrung?\n\n';
+  gl += '→ Wie halten Sie Ihr Fachwissen aktuell?\n\n';
+  gl += '→ Können Sie ein kurzes didaktisches Konzept für diese Veranstaltung vorlegen?\n\n';
+  gl += '→ Welche Materialien setzen Sie ein, und von wem stammen diese?\n\n';
+  gl += 'ERWACHSENENPÄDAGOGISCHE KOMPETENZ\n\n';
+  gl += '→ Welche Erfahrungen haben Sie in der Erwachsenenbildung?\n\n';
+  gl += `→ Die Zielgruppe sind ${zg}. Haben Sie Erfahrung mit dieser Zielgruppe?\n\n`;
+  gl += '→ Wie gehen Sie mit unterschiedlichem Vorwissen innerhalb einer Gruppe um?\n\n';
+  gl += '→ Wie vermeiden Sie beschämende oder moralisierende Formulierungen, wenn es um persönliche Finanzen geht?\n\n';
+  gl += 'UNABHÄNGIGKEIT\n\n';
+  gl += '→ Welche beruflichen oder institutionellen Interessen bringen Sie mit?\n\n';
+  gl += '→ Gibt es Verbindungen zu Banken, Versicherungen, Finanzdienstleistern oder deren Produkten?\n\n';
+  gl += '→ Wie stellen Sie sicher, dass in der Veranstaltung keine Produktwerbung erfolgt?\n\n';
+  gl += '→ Wie gehen Sie mit persönlichen Finanzfragen von Teilnehmenden um, die über den Kursinhalt hinausgehen?\n\n';
+  if (d.kultur === 'ja_bekannt' || d.kultur === 'vermutlich') {
+    gl += 'KULTURELLE SENSIBILITÄT\n\n';
+    gl += '→ Haben Sie Erfahrung mit kulturell oder religiös geprägten Haltungen zum Umgang mit Geld?\n\n';
+    gl += '→ Wie gehen Sie damit um, wenn Teilnehmende aus religiösen Gründen bestimmte Finanzprodukte ablehnen?\n\n';
+  }
+  if (d.lernform && d.lernform !== 'praesenz' && d.lernform !== 'lernform_offen') {
+    gl += 'DIGITALE KOMPETENZ\n\n';
+    gl += '→ Haben Sie Erfahrung mit der Durchführung von Online- oder Hybridveranstaltungen?\n\n';
+    gl += '→ Welche technischen Voraussetzungen benötigen Sie?\n\n';
+  }
+  gl += '════════════════════════════════════════\n\n';
+  gl += 'VEREINBARUNGEN (bei Bedarf im Gespräch klären)\n\n';
+  gl += '□  Werbeverbot in der Veranstaltung\n';
+  gl += '□  Keine Einzelberatung im Anschluss an die Veranstaltung\n';
+  gl += '□  Bekenntnis zum Leitbild der Einrichtung\n';
+  gl += '□  Transparenz über beruflichen Hintergrund in der Ausschreibung\n';
+  gl += '□  Profil in der Dozierendenübersicht der Einrichtung\n';
+  return gl;
+}
+
+function renderOutputs(outputs) {
+  const container = document.getElementById('output-cards');
+  container.innerHTML = outputs.map(o => {
+    let body = '';
+    if (o.risks) {
+      body = `<div class="risk-grid">${o.risks.map(r =>
+        `<div class="risk-item"><span class="risk-dot ${r.color}"></span><strong>${r.label}:</strong>&nbsp;${r.text}</div>`
+      ).join('')}</div>`;
+    } else {
+      body = `<div class="output-text">${escHtml(o.content)}</div>`;
+    }
+    return `<div class="output-card${o.open ? ' open' : ''}" id="oc-${o.id}">
+      <div class="output-card-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="output-card-title"><span class="output-tag ${o.tag}">${o.tagLabel}</span>${o.title}</div>
+        <span class="output-chevron">▾</span>
+      </div>
+      <div class="output-card-body">${body}</div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ============ SHARING / DOWNLOAD ============
+function downloadAll() {
+  const d = collectData();
+  const outputs = buildOutputs(d);
+  let text = outputs.map(o => {
+    let section = `${'='.repeat(50)}\n${o.title}\n${'='.repeat(50)}\n\n`;
+    if (o.risks) section += o.risks.map(r => `[${r.color.toUpperCase()}] ${r.label}: ${r.text}`).join('\n');
+    else section += o.content;
+    return section;
+  }).join('\n\n');
+  downloadFile(`Planung_${(d.titel || 'Angebot').replace(/\s+/g, '_')}.txt`, text, 'text/plain');
+}
+
+function downloadShare() {
+  const d = collectData();
+  const outputs = buildOutputs(d);
+  const shareData = {
+    meta: {
+      titel: d.titel,
+      zielgruppe: d.zielgruppe,
+      wirkung: d.wirkung,
+      format: d.format,
+      trends: d.trends.filter(t => t !== 'keinen'),
+      einrichtung: val('share_einrichtung') || null,
+      kontakt: val('share_kontakt') || null,
+      datum: new Date().toISOString().slice(0, 10)
+    },
+    materialien: []
+  };
+
+  if (document.getElementById('share_ae').checked) {
+    shareData.materialien.push({typ: 'ausschreibung', inhalt: outputs.find(o => o.id === 'ae').content});
+  }
+  if (document.getElementById('share_zp').checked) {
+    shareData.materialien.push({typ: 'zielgruppenprofil', inhalt: outputs.find(o => o.id === 'zp').content});
+  }
+  if (document.getElementById('share_notiz').checked && val('share_notiz_text')) {
+    shareData.materialien.push({typ: 'erfahrungsnotiz', inhalt: val('share_notiz_text')});
+  }
+
+  if (shareData.materialien.length === 0) {
+    alert('Bitte wählen Sie mindestens ein Material zur Freigabe aus.');
+    return;
+  }
+
+  downloadFile(`Materialfreigabe_${(d.titel || 'Angebot').replace(/\s+/g, '_')}.json`, JSON.stringify(shareData, null, 2), 'application/json');
+}
+
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], {type: type + ';charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
