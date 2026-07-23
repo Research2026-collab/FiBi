@@ -1,5 +1,7 @@
 Digital Planning Tools for Financial Education
 
+Copyright © 2026 Elisabeth Vanderheiden.
+
 An interactive planning tool for adult educators and programme planners to design target group-oriented educational offers based on realistic learner personas.
 
 Overview
