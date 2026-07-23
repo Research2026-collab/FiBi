@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+
+title: "FiBi – Digital Planning Tools for Financial Education"
+
+message: "If you use this repository, please cite it using the metadata below."
+
+type: software
+
+authors:
+  - family-names: Vanderheiden
+    given-names: Elisabeth
+    orcid: "https://orcid.org/0000-0002-0781-5435"
+
+abstract: >
+  Interactive planning tools supporting adult educators and programme
+  planners in designing learner-centred educational offers in
+  financial education using persona-based planning.
+
+keywords:
+  - adult education
+  - financial education
+  - programme planning
+  - personas
+  - continuing education
+  - educational design
+
+repository-code: "https://github.com/research2026-collab/FiBi"
+
+url: "https://research2026-collab.github.io/FiBi/personas.html"
+
+version: "1.0.0"
+
+date-released: 2026-07-23
