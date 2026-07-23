@@ -1,5 +1,5 @@
 Digital Planning Tools for Financial Education
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21504930.svg)](https://doi.org/10.5281/zenodo.21504930)
 Copyright © 2026 Elisabeth Vanderheiden.
 
 An interactive planning tool for adult educators and programme planners to design target group-oriented educational offers based on realistic learner personas.
@@ -58,7 +58,9 @@ Elisabeth Vanderheiden
 
 Citation
 
-If you use this application in research, teaching or programme development, please cite the archived Zenodo release. The DOI will be added after the first public release.
+Please cite version 1.0.0 of this software as:
+
+Vanderheiden, E. (2026). *FiBi – Digital Planning Tools for Financial Education* (Version 1.0.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.21504930
 
 Licence
 
