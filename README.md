@@ -60,13 +60,14 @@ If you use this application in research, teaching or programme development, plea
 
 Licence
 
-The source code of this repository is licensed under the MIT License.
+The educational content of this repository, including the persona descriptions, planning materials and accompanying texts, is licensed under the Creative Commons Attribution-NonCommercial 4.0 International Licence (CC BY-NC 4.0).
 
-Unless otherwise indicated, the educational content, including the persona descriptions, planning materials and accompanying texts, is licensed under the Creative Commons Attribution-NonCommercial 4.0 International Licence (CC BY-NC 4.0).
+The source code of this application is provided for access to the published web application only. All rights to the source code are reserved. No permission is granted to copy, redistribute, modify or use the source code except where required by applicable law or with the prior written permission of the copyright holder.
 
-Photographs used in this repository originate from Unsplash and remain subject to the Unsplash License. They are not covered by the CC BY-NC 4.0 licence.
+Photographs used in this repository originate from Unsplash and remain subject to the Unsplash License.
 
-Logos and any other third-party materials remain the property of their respective copyright holders and are excluded from the licences above unless explicitly stated otherwise.
+Logos and any other third-party materials remain the property of their respective copyright holders.
+
 
 Keywords
 
