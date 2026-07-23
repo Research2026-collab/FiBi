@@ -1,6 +1,5 @@
 # FiBi – Digital Planning Tools for Financial Education
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21504930.svg)](https://doi.org/10.5281/zenodo.21504930)
 
 Copyright © 2026 Elisabeth Vanderheiden.
 
