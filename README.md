@@ -57,7 +57,7 @@ https://research2026-collab.github.io/FiBi/personas.html
 Author
 
 Elisabeth Vanderheiden
-
+Claude Sonnet 5, an AI model developed by Anthropic, was used to generate the source code for this application. The conceptual design, the development of the application concept, the definition of the requirements, and all technical and design decisions were made by Elisabeth Vanderheiden.
 Citation
 
 Please cite version 1.0.0 of this software as:
