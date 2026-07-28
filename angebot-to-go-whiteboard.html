@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angebot to go – Whiteboard</title>
+<style>
+:root {
+  --navy: #1a365d;
+  --navy-light: #2a4a7f;
+  --teal: #2b7a78;
+  --teal-light: #3aafa9;
+  --amber: #d69e2e;
+  --red: #c53030;
+  --green: #276749;
+
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #1a202c;
+  --text-muted: #4a5568;
+  --text-light: #718096;
+  --border: #e2e8f0;
+
+  /* Aliase auf das FiBi-Projektschema, damit bestehende Regeln unverändert greifen */
+  --accent: var(--navy);
+  --accent-medium: var(--teal);
+  --accent-light: #ebf8ff;
+  --text-faint: var(--text-light);
+  --surface-2: #eef0f3;
+
+  /* Zielgruppen-Palette: nutzt die im Projekt bereits reservierten, aber
+     bislang ungenutzten Farben (Rot, Navy-Hell, Grün, Amber) und ergänzt
+     drei weitere gedeckte Töne im selben Stil. */
+  --frauen: var(--red);        --frauen-hell: #fbeaea;
+  --maenner: var(--navy-light);--maenner-hell: #eaeef5;
+  --familien: var(--green);    --familien-hell: #e8f3ec;
+  --einfachesprache: var(--amber); --einfachesprache-hell: #fbf3e2;
+  --eltern: #9d5b7a;           --eltern-hell: #f5e9ee;
+  --senior: #3d6b7a;           --senior-hell: #e8f0f2;
+  --eigene: #6b6b67;           --eigene-hell: #ececeb;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app { max-width: 980px; margin: 0 auto; padding: 32px 20px 64px; }
+
+.header { text-align: center; margin-bottom: 24px; }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-medium);
+  margin-bottom: 6px;
+}
+
+h1 { font-size: 22px; font-weight: 800; color: var(--accent); margin: 0 0 10px; }
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.nav-links { display: flex; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+.nav-links a {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.nav-links a:hover { border-color: var(--teal); color: var(--teal); }
+
+.controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.search-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+
+.search-row input[type="search"] {
+  flex: 1;
+  min-width: 220px;
+  font-size: 14px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+}
+
+.search-row input[type="search"]:focus,
+.search-row select:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(43,122,120,0.1);
+}
+
+.search-row select {
+  font-size: 13px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+}
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.tab {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s;
+}
+
+.tab:hover { border-color: var(--teal-light); }
+
+.tab.active {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+
+.meta-row {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--card-color, var(--navy));
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 1px 2px rgba(26,32,44,0.06);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(26,32,44,0.08);
+}
+
+.card-head { margin-bottom: 6px; }
+
+.card-title { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0; }
+
+.card-subtitle { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
+
+.badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--badge-bg, var(--surface-2));
+  color: var(--badge-color, var(--text-muted));
+}
+
+.card-body { font-size: 13px; line-height: 1.65; color: var(--text-muted); }
+
+.card-body strong { color: var(--text); font-weight: 600; }
+
+.card-section { margin-top: 6px; }
+
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.contact { font-size: 11.5px; color: var(--text-faint); }
+
+.download-btn {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: none;
+  border-radius: 20px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 13px;
+  padding: 40px 0;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="eyebrow">Finanzielle Bildung · Produktklinik</div>
+    <h1>Angebot to go</h1>
+    <p class="subtitle">Alle eingereichten Bildungsangebote im Überblick. Suchen, nach Zielgruppe oder Veranstaltungsform filtern und einzelne Angebote herunterladen.</p>
+    <div class="nav-links">
+      <a href="angebot-to-go-eingabe.html">Eigenes Angebot einreichen →</a>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="search-row">
+      <input type="search" id="searchInput" placeholder="Suche nach Titel, Lerninhalten, Lernzielen …">
+      <select id="formSelect">
+        <option value="">Alle Veranstaltungsformen</option>
+        <option value="Kurs">Kurs</option>
+        <option value="Seminar">Seminar</option>
+        <option value="Workshop">Workshop</option>
+        <option value="Exkursion">Exkursion</option>
+        <option value="Reise">Reise</option>
+        <option value="Online-Kurs">Online-Kurs</option>
+        <option value="Blended Learning">Blended Learning</option>
+        <option value="Hybrid-Kurs">Hybrid-Kurs</option>
+      </select>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="meta-row" id="metaRow"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+// Nach dem Deployment die exec-URL des Apps-Script-Web-Apps hier eintragen.
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiRTYqKTrogl7R5B5F0tybFeplipwH6qxpoAGCZestvwx3kwo9QDVNrMAEij-ShnVyhg/exec';
+
+const ZIELGRUPPEN = [
+  { key: 'Alle', color: null, colorHell: null },
+  { key: 'Frauen', color: 'var(--frauen)', colorHell: 'var(--frauen-hell)' },
+  { key: 'Männer', color: 'var(--maenner)', colorHell: 'var(--maenner-hell)' },
+  { key: 'Familien', color: 'var(--familien)', colorHell: 'var(--familien-hell)' },
+  { key: 'Menschen mit Bedarf an Einfacher Sprache', color: 'var(--einfachesprache)', colorHell: 'var(--einfachesprache-hell)' },
+  { key: 'Eltern', color: 'var(--eltern)', colorHell: 'var(--eltern-hell)' },
+  { key: 'Senior:innen', color: 'var(--senior)', colorHell: 'var(--senior-hell)' },
+  { key: 'Eigene Zielgruppe', color: 'var(--eigene)', colorHell: 'var(--eigene-hell)' }
+];
+
+let alleEintraege = [];
+let aktiverTab = 'Alle';
+
+const grid = document.getElementById('grid');
+const metaRow = document.getElementById('metaRow');
+const tabsEl = document.getElementById('tabs');
+const searchInput = document.getElementById('searchInput');
+const formSelect = document.getElementById('formSelect');
+
+function zielgruppenInfo(zielgruppe) {
+  return ZIELGRUPPEN.find(function (z) { return z.key === zielgruppe; }) || ZIELGRUPPEN[ZIELGRUPPEN.length - 1];
+}
+
+function renderTabs() {
+  tabsEl.innerHTML = '';
+  ZIELGRUPPEN.forEach(function (z) {
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (aktiverTab === z.key ? ' active' : '');
+    tab.textContent = z.key;
+    tab.addEventListener('click', function () {
+      aktiverTab = z.key;
+      renderTabs();
+      renderCards();
+    });
+    tabsEl.appendChild(tab);
+  });
+}
+
+function passtZuFilter(eintrag) {
+  const zielgruppe = eintrag.Zielgruppe || '';
+  const veranstaltungsform = eintrag.Veranstaltungsform || '';
+  const suchtext = searchInput.value.trim().toLowerCase();
+  const formFilter = formSelect.value;
+
+  if (aktiverTab !== 'Alle' && zielgruppe !== aktiverTab) return false;
+  if (formFilter && veranstaltungsform !== formFilter) return false;
+
+  if (suchtext) {
+    const haystack = [
+      eintrag.Titel, eintrag.Untertitel, eintrag.Lerninhalte, eintrag.Lernziele,
+      eintrag.Einrichtung, eintrag.ZielgruppeEigene
+    ].join(' ').toLowerCase();
+    if (haystack.indexOf(suchtext) === -1) return false;
+  }
+
+  return true;
+}
+
+function escapeHtml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function baueDownloadText(eintrag) {
+  const zielgruppeAnzeige = eintrag.Zielgruppe === 'Eigene Zielgruppe' && eintrag.ZielgruppeEigene
+    ? eintrag.ZielgruppeEigene
+    : eintrag.Zielgruppe;
+
+  return [
+    'Titel: ' + (eintrag.Titel || ''),
+    eintrag.Untertitel ? 'Untertitel: ' + eintrag.Untertitel : null,
+    'Zielgruppe: ' + (zielgruppeAnzeige || ''),
+    'Veranstaltungsform: ' + (eintrag.Veranstaltungsform || ''),
+    '',
+    'Lerninhalte:',
+    eintrag.Lerninhalte || '–',
+    '',
+    'Lernziele:',
+    eintrag.Lernziele || '–',
+    '',
+    eintrag.ReferentVorschlag ? 'Vorschlag Referent:in: ' + eintrag.ReferentVorschlag + ' (Einwilligung: ' + (eintrag.Einwilligung || 'nicht angegeben') + ')' : null,
+    eintrag.Teilnahmegebuehr ? 'Teilnahmegebühr: ' + eintrag.Teilnahmegebuehr : null,
+    eintrag.VorschlagendePerson ? 'Vorschlagende Person: ' + eintrag.VorschlagendePerson : null,
+    eintrag.Einrichtung ? 'Einrichtung: ' + eintrag.Einrichtung : null,
+    eintrag.Kontakt ? 'Kontakt: ' + eintrag.Kontakt : null
+  ].filter(function (line) { return line !== null; }).join('\n');
+}
+
+function download(eintrag) {
+  const text = baueDownloadText(eintrag);
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const dateiname = (eintrag.Titel || 'angebot').toLowerCase()
+    .replace(/[^a-z0-9äöüß]+/g, '-').replace(/(^-|-$)/g, '');
+  link.href = url;
+  link.download = dateiname + '.txt';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function renderCards() {
+  const gefiltert = alleEintraege.filter(passtZuFilter);
+
+  metaRow.textContent = gefiltert.length + ' von ' + alleEintraege.length + ' Angeboten';
+
+  if (gefiltert.length === 0) {
+    grid.innerHTML = '<div class="empty-state">Keine Angebote gefunden. Filter anpassen oder ein neues Angebot einreichen.</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+
+  gefiltert.forEach(function (eintrag) {
+    const info = zielgruppenInfo(eintrag.Zielgruppe);
+    const zielgruppeAnzeige = eintrag.Zielgruppe === 'Eigene Zielgruppe' && eintrag.ZielgruppeEigene
+      ? eintrag.ZielgruppeEigene
+      : eintrag.Zielgruppe;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    if (info.color) card.style.setProperty('--card-color', info.color);
+
+    card.innerHTML =
+      '<div class="card-head">' +
+        '<p class="card-title">' + escapeHtml(eintrag.Titel) + '</p>' +
+        (eintrag.Untertitel ? '<p class="card-subtitle">' + escapeHtml(eintrag.Untertitel) + '</p>' : '') +
+      '</div>' +
+      '<div class="badge-row">' +
+        '<span class="badge" style="--badge-bg:' + (info.colorHell || 'var(--surface-2)') + '; --badge-color:' + (info.color || 'var(--text-muted)') + '">' + escapeHtml(zielgruppeAnzeige) + '</span>' +
+        '<span class="badge">' + escapeHtml(eintrag.Veranstaltungsform) + '</span>' +
+      '</div>' +
+      '<div class="card-body">' +
+        (eintrag.Lerninhalte ? '<div class="card-section"><strong>Lerninhalte:</strong> ' + escapeHtml(eintrag.Lerninhalte) + '</div>' : '') +
+        (eintrag.Lernziele ? '<div class="card-section"><strong>Lernziele:</strong> ' + escapeHtml(eintrag.Lernziele) + '</div>' : '') +
+        (eintrag.Teilnahmegebuehr ? '<div class="card-section"><strong>Teilnahmegebühr:</strong> ' + escapeHtml(eintrag.Teilnahmegebuehr) + '</div>' : '') +
+      '</div>' +
+      '<div class="card-foot">' +
+        '<span class="contact">' + escapeHtml(eintrag.Einrichtung || eintrag.VorschlagendePerson || '') + '</span>' +
+        '<button class="download-btn" type="button">Herunterladen</button>' +
+      '</div>';
+
+    card.querySelector('.download-btn').addEventListener('click', function () {
+      download(eintrag);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+function ladeDaten() {
+  grid.innerHTML = '<div class="empty-state">Angebote werden geladen …</div>';
+
+  fetch(APPS_SCRIPT_URL + '?action=list')
+    .then(function (response) { return response.json(); })
+    .then(function (daten) {
+      alleEintraege = Array.isArray(daten) ? daten : [];
+      renderCards();
+    })
+    .catch(function () {
+      grid.innerHTML = '<div class="empty-state">Die Angebote konnten nicht geladen werden. Ist die APPS_SCRIPT_URL korrekt hinterlegt?</div>';
+    });
+}
+
+renderTabs();
+searchInput.addEventListener('input', renderCards);
+formSelect.addEventListener('change', renderCards);
+ladeDaten();
+</script>
+</body>
+</html>
