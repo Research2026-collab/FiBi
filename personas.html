@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Persona-Werkstatt – Angebote der finanziellen Bildung für Erwachsene planen</title>
+<title>Persona.Werkstatt – Angebote der finanziellen Bildung für Erwachsene planen</title>
 <style>
 :root {
   --navy: #1a365d; --navy-light: #2a4a7f; --teal: #2b7a78; --teal-light: #3aafa9;
@@ -112,7 +112,7 @@ textarea { min-height:70px; resize:vertical; }
 <div class="app">
   <div class="header">
     <div class="eyebrow">Angebote der finanziellen Bildung für Erwachsene planen</div>
-    <h1>Persona-Werkstatt</h1>
+    <h1>Persona.Werkstatt</h1>
     <p class="subtitle">Diese Anwendung stellt Ihnen 15 Personas mit unterschiedlichen Profilen für die Planung von Angeboten zur finanziellen Bildung vor. Personas sind fiktive, prototypisch angelegte Personen. Sie bündeln Informationen über mögliche Adressat:innen und können dabei unterstützen, unterschiedliche Voraussetzungen bei Planungsentscheidungen zu berücksichtigen. Wählen Sie eine Persona für Ihre weitere Arbeit oder entwickeln Sie eine eigene Persona.</p>
     <div class="nav-links">
       <a href="persona-werkstatt-kurzfortbildung.html" class="btn-develop">Digitale Kurzfortbildung</a>
@@ -477,7 +477,7 @@ function sendToPool() {
   const wirkung = document.getElementById('f_wirkung').value;
   const format = document.getElementById('f_format').value;
 
-  let body = 'Materialfreigabe aus der Persona-Werkstatt\n\n';
+  let body = 'Materialfreigabe aus der Persona.Werkstatt\n\n';
   body += '--- METADATEN ---\n';
   body += 'Titel: ' + titel + '\n';
   body += 'Persona: ' + p.name + ', ' + p.alter + ' – ' + p.kurz + '\n';
@@ -488,7 +488,7 @@ function sendToPool() {
   body += ae;
   body += '\n\n--- ENDE ---';
 
-  const subject = 'Materialfreigabe Persona-Werkstatt: ' + titel;
+  const subject = 'Materialfreigabe Persona.Werkstatt: ' + titel;
   const mailto = 'mailto:lilli33308@gmail.com'
     + '?subject=' + encodeURIComponent(subject)
     + '&body=' + encodeURIComponent(body);
