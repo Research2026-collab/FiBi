@@ -16,6 +16,12 @@
 .site-footer{border-top:1px solid var(--border);background:#eef0f3;padding:14px 20px;margin-top:24px}.site-footer p{max-width:1040px;margin:0 auto;font-size:13px;color:#8a8a86;text-align:center}.site-footer a{color:#8a8a86;text-decoration:underline}
 @media(max-width:700px){.scale{grid-template-columns:1fr}.scale label{display:flex;align-items:center;gap:8px;text-align:left}.scale input{display:inline;margin:0}.header{padding-top:28px}}
 .contact-btn { display:inline-block; text-decoration:none; margin-top:14px; }
+.privacy a{color:var(--teal)}
+.ds{margin-top:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);padding:10px 14px;font-size:12px;color:var(--text-muted)}
+.ds summary{cursor:pointer;font-weight:600;color:var(--navy);font-size:13px}
+.ds h3{font-size:12px;font-weight:700;color:var(--navy);margin:12px 0 2px}
+.ds p{margin-bottom:4px}
+.todo{background:#fefcbf;color:var(--text);padding:0 2px;border-radius:2px}
 </style>
 </head>
 <body>
@@ -59,6 +65,7 @@
       <div class="rating-question"><p>Das Fortbildungsmodul war für mich verständlich und gut zu nutzen.</p><div class="scale" data-name="fortbildung_verstaendlichkeit"></div></div>
       <div class="rating-question"><p>Das Fortbildungsmodul war für meinen konkreten Planungs- oder Nutzungskontext hilfreich.</p><div class="scale" data-name="fortbildung_nutzen"></div></div>
       <div class="rating-question"><p>Das Fortbildungsmodul lässt sich auf meine eigene Bildungspraxis übertragen.</p><div class="scale" data-name="fortbildung_uebertragbarkeit"></div></div>
+      <div class="rating-question"><p>Das Fortbildungsmodul hat mein Verständnis zielgruppenorientierter Planung erweitert.</p><div class="scale" data-name="fortbildung_lernzuwachs"></div></div>
     </div>
     <div id="angebotBlock" class="rating-block"><h2>Angebot to go</h2>
       <div class="rating-question"><p>„Angebot to go“ war für mich verständlich und gut zu nutzen.</p><div class="scale" data-name="angebot_verstaendlichkeit"></div></div>
@@ -72,7 +79,22 @@
       <div class="form-field"><label for="fehlte">Was hat für Sie weniger gut funktioniert oder was hat Ihnen gefehlt?</label><textarea id="fehlte" name="fehlte"></textarea></div>
       <div class="form-field"><label for="wuensche">Was würden Sie sich für die weitere Entwicklung wünschen?</label><textarea id="wuensche" name="wuensche"></textarea></div>
       <div class="form-field"><label for="sonstiges">Möchten Sie uns noch etwas mitteilen?</label><textarea id="sonstiges" name="sonstiges"></textarea></div>
-      <p class="privacy">Die Angaben werden ausschließlich für die Auswertung und Weiterentwicklung der Transferinstrumente verwendet. Name, Institution und E-Mail-Adresse sind freiwillig und werden in den Auswertungsblättern nicht ausgegeben.</p>
+      <p class="privacy">Die Angaben werden ausschließlich für die Auswertung und Weiterentwicklung der Transferinstrumente verwendet. Name, Institution und E-Mail-Adresse sind freiwillig und werden in den Auswertungsblättern nicht ausgegeben. Mit dem Absenden willigen Sie in die im <a href="#datenschutz" class="ds-open">Datenschutzhinweis</a> beschriebene Verarbeitung ein.</p>
+      <details id="datenschutz" class="ds">
+        <summary>Datenschutzhinweis</summary>
+        <h3>Verantwortliche Stelle</h3>
+        <p>Katholische Erwachsenenbildung Rheinland-Pfalz – Landesarbeitsgemeinschaft e.V., Welschnonnengasse 2–4, 55116 Mainz. Weitere Angaben finden Sie im <a href="https://keb-rheinland-pfalz.de/impressum/" target="_blank" rel="noopener">Impressum der KEB Rheinland-Pfalz</a>.<br>Ansprechperson für dieses Formular: <a href="mailto:ev@keb-rheinland-pfalz.de">ev@keb-rheinland-pfalz.de</a></p>
+        <h3>Welche Daten verarbeitet werden</h3>
+        <p>Verarbeitet werden die Angaben, die Sie in diesem Formular machen. Dazu gehören Ihre Bewertungen, Ihre Antworten auf die offenen Fragen sowie Ihre Angaben zu Bildungsbereich und Nutzungskontext. Name, Institution und E-Mail-Adresse werden nur verarbeitet, wenn Sie diese freiwillig eintragen. Zusätzlich wird der Zeitpunkt der Übermittlung gespeichert.</p>
+        <h3>Zweck und Rechtsgrundlage</h3>
+        <p>Die Angaben dienen ausschließlich der Auswertung und Weiterentwicklung der Persona.Werkstatt, der digitalen Kurzfortbildung und von „Angebot to go“ im Rahmen des Projekts MoTIf. Ergebnisse werden in zusammengefasster Form berichtet. Einzelne Antworten auf offene Fragen können als Zitat ohne Namen und Institution wiedergegeben werden. Die Verarbeitung beruht auf Ihrer Einwilligung, die Sie mit dem Absenden des Formulars erteilen (Art. 6 Abs. 1 lit. a DSGVO).</p>
+        <h3>Übermittlung und Speicherung</h3>
+        <p>Die Angaben werden über Google Apps Script übermittelt und in einer Google-Tabelle gespeichert. Google verarbeitet die Daten dabei als technischer Dienstleister. Eine Verarbeitung auf Servern außerhalb der Europäischen Union, insbesondere in den USA, ist dabei möglich. Name, Institution und E-Mail-Adresse werden in den Auswertungsblättern nicht ausgegeben. Diese Website wird über GitHub Pages bereitgestellt. GitHub verarbeitet beim Aufruf der Seite technisch notwendige Verbindungsdaten wie Ihre IP-Adresse.</p>
+        <h3>Speicherdauer</h3>
+        <p>Die Angaben werden gelöscht, sobald sie für die Auswertung nicht mehr benötigt werden, spätestens am 31. März 2028.</p>
+        <h3>Ihre Rechte</h3>
+        <p>Sie haben das Recht auf Auskunft über die zu Ihrer Person gespeicherten Daten sowie auf Berichtigung, Löschung und Einschränkung der Verarbeitung. Ihre Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen, etwa per E-Mail an <a href="mailto:ev@keb-rheinland-pfalz.de">ev@keb-rheinland-pfalz.de</a>. Rückmeldungen ohne Namen oder E-Mail-Adresse lassen sich keiner Person zuordnen und können daher nachträglich nicht einzeln gelöscht werden. Sie können sich außerdem bei einer Datenschutzaufsichtsbehörde beschweren. Weitere Informationen enthält die <a href="https://keb-rheinland-pfalz.de/datenschutz/" target="_blank" rel="noopener">Datenschutzerklärung der KEB Rheinland-Pfalz</a>.</p>
+      </details>
     </div>
 
     <div id="errorBox" class="error"></div><div class="actions"><button class="submit-btn" type="submit">Rückmeldung absenden</button></div>
@@ -85,13 +107,18 @@
     <div class="actions"><a href="personas.html" class="btn-develop">Zurück zur Persona.Werkstatt</a></div>
   </div>
 </div>
-<footer class="site-footer"><p>&copy; Elisabeth Vanderheiden. Lizenziert unter <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.de" target="_blank" rel="noopener">CC BY-NC 4.0</a> &middot; freie Nutzung mit Namensnennung, keine kommerzielle Nutzung.</p></footer>
+<footer class="site-footer"><p>&copy; Elisabeth Vanderheiden. Lizenziert unter <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.de" target="_blank" rel="noopener">CC BY-NC 4.0</a> &middot; freie Nutzung mit Namensnennung, keine kommerzielle Nutzung. &middot; <a href="#datenschutz" class="ds-open">Datenschutz</a></p></footer>
 <script>
 const labels=['trifft gar nicht zu','trifft eher nicht zu','teils/teils','trifft eher zu','trifft vollständig zu'];
 document.querySelectorAll('.scale').forEach(scale=>{const name=scale.dataset.name; labels.forEach((label,i)=>{const el=document.createElement('label');el.innerHTML=`<input type="radio" name="${name}" value="${i+1}"> <span>${label}</span>`;scale.appendChild(el);});});
 document.querySelectorAll('input[type="checkbox"][data-target]').forEach(cb=>{cb.addEventListener('change',()=>{cb.closest('.check-item').classList.toggle('selected',cb.checked);const block=document.getElementById(cb.dataset.target);block.classList.toggle('active',cb.checked);block.querySelectorAll('input[type="radio"]').forEach(r=>r.required=cb.checked);});});
+const preselect={persona:'persona',fortbildung:'fortbildung',angebot:'angebot'}[new URLSearchParams(location.search).get('tool')];
+if(preselect){const cb=document.querySelector('input[type="checkbox"][name="'+preselect+'"]');if(cb&&!cb.checked){cb.checked=true;cb.dispatchEvent(new Event('change'));}}
 const form=document.getElementById('feedbackForm'), errorBox=document.getElementById('errorBox'), frame=document.getElementById('submitFrame'); let submitted=false;
 form.addEventListener('submit',e=>{errorBox.style.display='none'; const selected=[...document.querySelectorAll('input[type="checkbox"][data-target]')].some(c=>c.checked); if(!selected){e.preventDefault();errorBox.textContent='Bitte wählen Sie mindestens eine Anwendung aus.';errorBox.style.display='block';errorBox.scrollIntoView({behavior:'smooth',block:'center'});return;} submitted=true;});
+function openDs(){const d=document.getElementById('datenschutz');if(!d)return;d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}
+document.querySelectorAll('.ds-open').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openDs();}));
+if(location.hash==='#datenschutz')openDs();
 frame.addEventListener('load',()=>{if(!submitted)return; form.style.display='none';document.getElementById('success').classList.add('active');document.getElementById('success').scrollIntoView({behavior:'smooth',block:'start'});submitted=false;});
 </script>
 </body></html>
